@@ -1,0 +1,56 @@
+{
+  "summary": {
+    "total_predictions": 24,
+    "total_verified": 21,
+    "pending_verifications": 3,
+    "evaluation_period_days": "All-Time"
+  },
+  "overall_retail": {
+    "mae_rs_per_kg": 1.23,
+    "rmse_rs_per_kg": 1.63,
+    "mape_pct": 3.35,
+    "systematic_bias_rs": -0.34,
+    "directional_accuracy_pct": 100.0,
+    "hit_rate_within_5pct": 100.0,
+    "hit_rate_within_10pct": 100.0,
+    "hit_rate_within_2rs": 100.0
+  },
+  "overall_wholesale": {
+    "mae_rs_per_kg": 3.99,
+    "rmse_rs_per_kg": 7.38,
+    "mape_pct": 19.38
+  },
+  "by_commodity": {
+    "Tomato": {
+      "count": 7,
+      "mae_retail_rs": 0.78,
+      "rmse_retail_rs": 1.33,
+      "mape_retail_pct": 2.84,
+      "directional_accuracy_pct": 100.0,
+      "hit_rate_5pct": 100.0,
+      "hit_rate_10pct": 100.0,
+      "hit_rate_2rs": 100.0
+    },
+    "Onion": {
+      "count": 7,
+      "mae_retail_rs": 2.2,
+      "rmse_retail_rs": 2.37,
+      "mape_retail_pct": 4.34,
+      "directional_accuracy_pct": 100.0,
+      "hit_rate_5pct": 100.0,
+      "hit_rate_10pct": 100.0,
+      "hit_rate_2rs": 100.0
+    },
+    "Potato": {
+      "count": 7,
+      "mae_retail_rs": 0.72,
+      "rmse_retail_rs": 0.78,
+      "mape_retail_pct": 2.87,
+      "directional_accuracy_pct": 100.0,
+      "hit_rate_5pct": 100.0,
+      "hit_rate_10pct": 100.0,
+      "hit_rate_2rs": 100.0
+    }
+  },
+  "last_updated": "2026-11-17 21:05:48"
+}

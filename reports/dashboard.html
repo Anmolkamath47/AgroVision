@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agricultural Economist — Live Interactive Forecasting & Tracking Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for Dynamic Interactive Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-base: #0a0f1d;
+            --bg-surface: #111827;
+            --bg-card: #1e293b;
+            --bg-card-hover: #283548;
+            --border-color: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --accent-green: #10b981;
+            --accent-green-bg: rgba(16, 185, 129, 0.15);
+            --accent-blue: #3b82f6;
+            --accent-blue-bg: rgba(59, 130, 246, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-red-bg: rgba(239, 68, 68, 0.15);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 24px;
+        }
+        .container { max-width: 1440px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+        .title-group h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .title-group p { color: var(--text-secondary); font-size: 14px; margin-top: 4px; }
+        .badge-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--accent-green-bg);
+            color: var(--accent-green);
+            border: 1px solid var(--accent-green);
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .pulse-dot {
+            width: 8px; height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        
+        /* Tabs Switcher */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--bg-surface);
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            width: fit-content;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { color: #ffffff; background: var(--bg-card); }
+        .tab-btn.active {
+            background: var(--accent-blue);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+        }
+
+        /* KPI Cards */
+        .grid-kpi {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+        .kpi-card:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
+        .kpi-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            color: #ffffff;
+        }
+        .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Live Commodity Trajectory Cards */
+        .trajectory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .traj-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .traj-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+        }
+        .traj-title { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .traj-steps {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .step-item { text-align: center; }
+        .step-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+        .step-val { font-size: 13px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #ffffff; margin-top: 2px; }
+        .traj-cause-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px; }
+        .traj-cause-item { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; padding-left: 10px; border-left: 2px solid var(--accent-blue); }
+        .traj-advice { font-size: 12px; font-weight: 600; color: var(--accent-green); margin-top: 10px; padding: 6px 10px; background: var(--accent-green-bg); border-radius: 6px; }
+
+        /* Interactive Charts Container */
+        .charts-wrapper {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        @media (max-width: 1024px) { .charts-wrapper { grid-template-columns: 1fr; } }
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+        }
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .chart-title { font-size: 15px; font-weight: 700; color: #ffffff; }
+        .chart-canvas-container { position: relative; height: 320px; width: 100%; }
+
+        /* Table & Controls */
+        .table-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            background: var(--bg-surface);
+            border-bottom: 1px solid var(--border-color);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .search-input {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            width: 240px;
+        }
+        .search-input:focus { border-color: var(--accent-blue); }
+        .filter-select {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th {
+            background-color: rgba(15, 23, 42, 0.8);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        td { padding: 10px 16px; border-bottom: 1px solid rgba(51, 65, 85, 0.3); }
+        tr:hover td { background-color: var(--bg-card-hover); }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .badge { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        .badge-tomato { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+        .badge-onion { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid #8b5cf6; }
+        .badge-potato { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
+        .pill { padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; }
+        .pill-success { background: var(--accent-green-bg); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .pill-warning { background: var(--accent-amber-bg); color: var(--accent-amber); border: 1px solid var(--accent-amber); }
+        .pill-danger { background: var(--accent-red-bg); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .pill-pending { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #64748b; }
+        .footer { text-align: center; font-size: 13px; color: var(--text-muted); padding-top: 16px; border-top: 1px solid var(--border-color); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="title-group">
+                <h1>AI Agricultural Economist: Live Dynamic Dashboard</h1>
+                <p>Real-Time Mandi Forecasting, Ground-Truth Verification, and Continuous Accuracy Analytics</p>
+            </div>
+            <div style="text-align: right;">
+                <div class="badge-live"><span class="pulse-dot"></span> LIVE DATA SYNC ACTIVE</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;" id="last-updated-text">August 26, 2026 - 22:19:22 IST</div>
+                <div style="font-size: 11px; color: #a78bfa; margin-top: 2px;">Last Retrained: 2026-08-25 11:46:53 (8,121 rows)</div>
+            </div>
+        </div>
+
+        <!-- Dynamic Commodity Switcher Tabs -->
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchCommodity('all')">🌐 All Commodities</button>
+            <button class="tab-btn" onclick="switchCommodity('Tomato')">🍅 Tomato</button>
+            <button class="tab-btn" onclick="switchCommodity('Onion')">🧅 Onion</button>
+            <button class="tab-btn" onclick="switchCommodity('Potato')">🥔 Potato</button>
+        </div>
+
+        <!-- KPI Grid -->
+        <div class="grid-kpi">
+            <div class="kpi-card">
+                <div class="kpi-title">Directional Accuracy</div>
+                <div class="kpi-value" style="color: var(--accent-green);" id="kpi-dir-acc">--%</div>
+                <div class="kpi-sub">Trend Up/Down Hit Rate</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Retail MAE</div>
+                <div class="kpi-value" id="kpi-mae">₹ --</div>
+                <div class="kpi-sub">Mean Abs Error / kg</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Retail MAPE</div>
+                <div class="kpi-value" id="kpi-mape">--%</div>
+                <div class="kpi-sub">Mean Percentage Error</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Precision (±5% Hit)</div>
+                <div class="kpi-value" style="color: var(--accent-blue);" id="kpi-hit5">--%</div>
+                <div class="kpi-sub">Within Tight 5% Band</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Precision (±10% Hit)</div>
+                <div class="kpi-value" style="color: var(--accent-purple);" id="kpi-hit10">--%</div>
+                <div class="kpi-sub">Within 10% Band</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-title">Verified Forecasts</div>
+                <div class="kpi-value" id="kpi-verified">-- <span style="font-size: 13px; color: var(--text-muted);" id="kpi-total">/ --</span></div>
+                <div class="kpi-sub" id="kpi-pending">-- Pending Next Day</div>
+            </div>
+        </div>
+
+        <!-- Live 14-Day Trajectory & Commodity Price Prediction Cards -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 14px;">
+            <div>
+                <h2 style="font-size: 17px; font-weight: 700; color: #ffffff;">📊 Bangalore Daily Commodity Price Prediction</h2>
+                <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Daily Market Price Forecast, 14-Day Trajectory & Origin Cause Attribution</p>
+            </div>
+            <div style="font-size: 12px; color: var(--accent-blue); font-weight: 600; background: var(--accent-blue-bg); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--accent-blue);">
+                📅 Generated: August 26, 2026 - 22:19:22 IST
+            </div>
+        </div>
+        <div class="trajectory-grid" id="trajectory-cards-container">
+            <!-- Rendered dynamically by JavaScript -->
+        </div>
+
+        <!-- Interactive Charts Section -->
+        <div class="charts-wrapper">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">📈 Predicted vs Actual Retail Price Series (Interactive)</div>
+                    <span style="font-size: 12px; color: var(--text-muted);">Hover for exact ground-truth comparison</span>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="timeSeriesChart"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">🎯 Error Residual Distribution</div>
+                    <span style="font-size: 12px; color: var(--text-muted);">Actual − Predicted</span>
+                </div>
+                <div class="chart-canvas-container">
+                    <canvas id="errorDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ground Truth Ledger Table -->
+        <div class="table-section">
+            <div class="table-controls">
+                <div style="font-size: 15px; font-weight: 700; color: #ffffff;">📋 Ground-Truth Prediction & Verification Ledger</div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="tableSearchInput" class="search-input" placeholder="Search by date or driver..." onkeyup="filterLedgerTable()">
+                    <select id="tableStatusFilter" class="filter-select" onchange="filterLedgerTable()">
+                        <option value="ALL">All Status</option>
+                        <option value="VERIFIED">Verified Only</option>
+                        <option value="PENDING">Pending Next Day</option>
+                        <option value="CORRECT">Correct (±5%)</option>
+                    </select>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target Date</th>
+                        <th>Commodity</th>
+                        <th>Predicted Price</th>
+                        <th>Actual Price</th>
+                        <th>Error (₹ / %)</th>
+                        <th>Direction</th>
+                        <th>Verification Status</th>
+                        <th>Primary Economic Driver</th>
+                    </tr>
+                </thead>
+                <tbody id="ledger-table-body">
+                    <!-- Rendered dynamically by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            Bangalore Agrometeorological & Mandi Price Forecasting System • Live Dynamic Interactive Dashboard
+        </div>
+    </div>
+
+    <!-- Live Client-Side Data & Controller Logic -->
+    <script>
+        const DASHBOARD_DATA = {"metrics": {"summary": {"total_predictions": 186, "total_verified": 150, "pending_verifications": 36, "evaluation_period_days": "All-Time"}, "overall_retail": {"mae_rs_per_kg": 0.39, "rmse_rs_per_kg": 0.92, "mape_pct": 0.86, "systematic_bias_rs": 0.22, "directional_accuracy_pct": 98.7, "hit_rate_within_5pct": 96.7, "hit_rate_within_10pct": 98.7, "hit_rate_within_2rs": 96.7}, "overall_wholesale": {"mae_rs_per_kg": 0.28, "rmse_rs_per_kg": 0.41, "mape_pct": 1.02}, "by_commodity": {"Tomato": {"count": 50, "mae_retail_rs": 0.89, "rmse_retail_rs": 1.55, "mape_retail_pct": 1.95, "directional_accuracy_pct": 98.0, "hit_rate_5pct": 90.0, "hit_rate_10pct": 96.0, "hit_rate_2rs": 90.0}, "Onion": {"count": 50, "mae_retail_rs": 0.23, "rmse_retail_rs": 0.32, "mape_retail_pct": 0.46, "directional_accuracy_pct": 98.0, "hit_rate_5pct": 100.0, "hit_rate_10pct": 100.0, "hit_rate_2rs": 100.0}, "Potato": {"count": 50, "mae_retail_rs": 0.05, "rmse_retail_rs": 0.06, "mape_retail_pct": 0.15, "directional_accuracy_pct": 100.0, "hit_rate_5pct": 100.0, "hit_rate_10pct": 100.0, "hit_rate_2rs": 100.0}}, "last_updated": "2026-08-26 22:19:21"}, "ledger": [{"prediction_id": "2026-06-16_Tomato_Bangalore", "date_predicted": "2026-06-15", "target_date": "2026-06-16", "commodity": "Tomato", "predicted_price": 43.6, "actual_price": 42.89, "error_rs": -0.71, "pct_error": 1.66, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-16_Onion_Bangalore", "date_predicted": "2026-06-15", "target_date": "2026-06-16", "commodity": "Onion", "predicted_price": 46.71, "actual_price": 46.48, "error_rs": -0.23, "pct_error": 0.49, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-16_Potato_Bangalore", "date_predicted": "2026-06-15", "target_date": "2026-06-16", "commodity": "Potato", "predicted_price": 31.71, "actual_price": 31.61, "error_rs": -0.1, "pct_error": 0.32, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-17_Tomato_Bangalore", "date_predicted": "2026-06-16", "target_date": "2026-06-17", "commodity": "Tomato", "predicted_price": 40.72, "actual_price": 40.83, "error_rs": 0.11, "pct_error": 0.27, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-17_Onion_Bangalore", "date_predicted": "2026-06-16", "target_date": "2026-06-17", "commodity": "Onion", "predicted_price": 44.3, "actual_price": 44.58, "error_rs": 0.28, "pct_error": 0.63, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-17_Potato_Bangalore", "date_predicted": "2026-06-16", "target_date": "2026-06-17", "commodity": "Potato", "predicted_price": 30.71, "actual_price": 30.79, "error_rs": 0.08, "pct_error": 0.26, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-18_Tomato_Bangalore", "date_predicted": "2026-06-17", "target_date": "2026-06-18", "commodity": "Tomato", "predicted_price": 42.57, "actual_price": 41.91, "error_rs": -0.66, "pct_error": 1.57, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-18_Onion_Bangalore", "date_predicted": "2026-06-17", "target_date": "2026-06-18", "commodity": "Onion", "predicted_price": 45.81, "actual_price": 45.33, "error_rs": -0.48, "pct_error": 1.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-18_Potato_Bangalore", "date_predicted": "2026-06-17", "target_date": "2026-06-18", "commodity": "Potato", "predicted_price": 31.14, "actual_price": 31.06, "error_rs": -0.08, "pct_error": 0.26, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-19_Potato_Bangalore", "date_predicted": "2026-06-18", "target_date": "2026-06-19", "commodity": "Potato", "predicted_price": 32.26, "actual_price": 32.31, "error_rs": 0.05, "pct_error": 0.15, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-19_Onion_Bangalore", "date_predicted": "2026-06-18", "target_date": "2026-06-19", "commodity": "Onion", "predicted_price": 48.14, "actual_price": 48.3, "error_rs": 0.16, "pct_error": 0.33, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-19_Tomato_Bangalore", "date_predicted": "2026-06-18", "target_date": "2026-06-19", "commodity": "Tomato", "predicted_price": 45.3, "actual_price": 45.26, "error_rs": -0.04, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-20_Tomato_Bangalore", "date_predicted": "2026-06-19", "target_date": "2026-06-20", "commodity": "Tomato", "predicted_price": 46.55, "actual_price": 47.26, "error_rs": 0.71, "pct_error": 1.5, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-20_Onion_Bangalore", "date_predicted": "2026-06-19", "target_date": "2026-06-20", "commodity": "Onion", "predicted_price": 49.65, "actual_price": 50.36, "error_rs": 0.71, "pct_error": 1.41, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-20_Potato_Bangalore", "date_predicted": "2026-06-19", "target_date": "2026-06-20", "commodity": "Potato", "predicted_price": 33.11, "actual_price": 33.23, "error_rs": 0.12, "pct_error": 0.36, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-06-21_Tomato_Bangalore", "date_predicted": "2026-06-20", "target_date": "2026-06-21", "commodity": "Tomato", "predicted_price": 39.11, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-21_Onion_Bangalore", "date_predicted": "2026-06-20", "target_date": "2026-06-21", "commodity": "Onion", "predicted_price": 47.71, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-21_Potato_Bangalore", "date_predicted": "2026-06-20", "target_date": "2026-06-21", "commodity": "Potato", "predicted_price": 31.99, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-23_Tomato_Bangalore", "date_predicted": "2026-06-22", "target_date": "2026-06-23", "commodity": "Tomato", "predicted_price": 37.88, "actual_price": 41.92, "error_rs": 4.04, "pct_error": 9.64, "is_direction_correct": true, "is_within_5pct": false, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-23_Onion_Bangalore", "date_predicted": "2026-06-22", "target_date": "2026-06-23", "commodity": "Onion", "predicted_price": 45.39, "actual_price": 45.72, "error_rs": 0.33, "pct_error": 0.72, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-23_Potato_Bangalore", "date_predicted": "2026-06-22", "target_date": "2026-06-23", "commodity": "Potato", "predicted_price": 31.24, "actual_price": 31.28, "error_rs": 0.04, "pct_error": 0.13, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-24_Potato_Bangalore", "date_predicted": "2026-06-23", "target_date": "2026-06-24", "commodity": "Potato", "predicted_price": 32.09, "actual_price": 32.0, "error_rs": -0.09, "pct_error": 0.28, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-24_Onion_Bangalore", "date_predicted": "2026-06-23", "target_date": "2026-06-24", "commodity": "Onion", "predicted_price": 47.84, "actual_price": 47.54, "error_rs": -0.3, "pct_error": 0.63, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-24_Tomato_Bangalore", "date_predicted": "2026-06-23", "target_date": "2026-06-24", "commodity": "Tomato", "predicted_price": 44.61, "actual_price": 44.22, "error_rs": -0.39, "pct_error": 0.88, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-25_Tomato_Bangalore", "date_predicted": "2026-06-24", "target_date": "2026-06-25", "commodity": "Tomato", "predicted_price": 47.1, "actual_price": 47.34, "error_rs": 0.24, "pct_error": 0.51, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-25_Onion_Bangalore", "date_predicted": "2026-06-24", "target_date": "2026-06-25", "commodity": "Onion", "predicted_price": 50.14, "actual_price": 50.42, "error_rs": 0.28, "pct_error": 0.56, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-25_Potato_Bangalore", "date_predicted": "2026-06-24", "target_date": "2026-06-25", "commodity": "Potato", "predicted_price": 33.13, "actual_price": 33.23, "error_rs": 0.1, "pct_error": 0.3, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-26_Tomato_Bangalore", "date_predicted": "2026-06-25", "target_date": "2026-06-26", "commodity": "Tomato", "predicted_price": 47.71, "actual_price": 47.73, "error_rs": 0.02, "pct_error": 0.04, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-26_Onion_Bangalore", "date_predicted": "2026-06-25", "target_date": "2026-06-26", "commodity": "Onion", "predicted_price": 49.66, "actual_price": 51.09, "error_rs": 1.43, "pct_error": 2.8, "is_direction_correct": false, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-26_Potato_Bangalore", "date_predicted": "2026-06-25", "target_date": "2026-06-26", "commodity": "Potato", "predicted_price": 33.58, "actual_price": 33.58, "error_rs": 0.0, "pct_error": 0.0, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-27_Tomato_Bangalore", "date_predicted": "2026-06-26", "target_date": "2026-06-27", "commodity": "Tomato", "predicted_price": 40.38, "actual_price": 45.06, "error_rs": 4.68, "pct_error": 10.39, "is_direction_correct": true, "is_within_5pct": false, "is_within_10pct": false, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-27_Onion_Bangalore", "date_predicted": "2026-06-26", "target_date": "2026-06-27", "commodity": "Onion", "predicted_price": 48.94, "actual_price": 48.9, "error_rs": -0.04, "pct_error": 0.08, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-27_Potato_Bangalore", "date_predicted": "2026-06-26", "target_date": "2026-06-27", "commodity": "Potato", "predicted_price": 32.69, "actual_price": 32.69, "error_rs": 0.0, "pct_error": 0.0, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-28_Potato_Bangalore", "date_predicted": "2026-06-27", "target_date": "2026-06-28", "commodity": "Potato", "predicted_price": 32.0, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-28_Onion_Bangalore", "date_predicted": "2026-06-27", "target_date": "2026-06-28", "commodity": "Onion", "predicted_price": 47.22, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-28_Tomato_Bangalore", "date_predicted": "2026-06-27", "target_date": "2026-06-28", "commodity": "Tomato", "predicted_price": 42.07, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-30_Tomato_Bangalore", "date_predicted": "2026-06-29", "target_date": "2026-06-30", "commodity": "Tomato", "predicted_price": 46.38, "actual_price": 46.72, "error_rs": 0.34, "pct_error": 0.73, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-30_Onion_Bangalore", "date_predicted": "2026-06-29", "target_date": "2026-06-30", "commodity": "Onion", "predicted_price": 50.11, "actual_price": 50.06, "error_rs": -0.05, "pct_error": 0.1, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-06-30_Potato_Bangalore", "date_predicted": "2026-06-29", "target_date": "2026-06-30", "commodity": "Potato", "predicted_price": 33.12, "actual_price": 33.11, "error_rs": -0.01, "pct_error": 0.03, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-01_Tomato_Bangalore", "date_predicted": "2026-06-30", "target_date": "2026-07-01", "commodity": "Tomato", "predicted_price": 48.3, "actual_price": 48.72, "error_rs": 0.42, "pct_error": 0.86, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Transport Logistics & Diesel Freight Pass-Through"}, {"prediction_id": "2026-07-01_Onion_Bangalore", "date_predicted": "2026-06-30", "target_date": "2026-07-01", "commodity": "Onion", "predicted_price": 52.1, "actual_price": 52.0, "error_rs": -0.1, "pct_error": 0.19, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-01_Potato_Bangalore", "date_predicted": "2026-06-30", "target_date": "2026-07-01", "commodity": "Potato", "predicted_price": 33.99, "actual_price": 33.95, "error_rs": -0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-02_Tomato_Bangalore", "date_predicted": "2026-07-01", "target_date": "2026-07-02", "commodity": "Tomato", "predicted_price": 43.03, "actual_price": 47.41, "error_rs": 4.38, "pct_error": 9.24, "is_direction_correct": true, "is_within_5pct": false, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-02_Onion_Bangalore", "date_predicted": "2026-07-01", "target_date": "2026-07-02", "commodity": "Onion", "predicted_price": 50.9, "actual_price": 51.08, "error_rs": 0.18, "pct_error": 0.35, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-02_Potato_Bangalore", "date_predicted": "2026-07-01", "target_date": "2026-07-02", "commodity": "Potato", "predicted_price": 33.61, "actual_price": 33.62, "error_rs": 0.01, "pct_error": 0.03, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-03_Potato_Bangalore", "date_predicted": "2026-07-02", "target_date": "2026-07-03", "commodity": "Potato", "predicted_price": 32.5, "actual_price": 32.44, "error_rs": -0.06, "pct_error": 0.18, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-03_Tomato_Bangalore", "date_predicted": "2026-07-02", "target_date": "2026-07-03", "commodity": "Tomato", "predicted_price": 40.44, "actual_price": 44.26, "error_rs": 3.82, "pct_error": 8.63, "is_direction_correct": true, "is_within_5pct": false, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-03_Onion_Bangalore", "date_predicted": "2026-07-02", "target_date": "2026-07-03", "commodity": "Onion", "predicted_price": 48.63, "actual_price": 48.29, "error_rs": -0.34, "pct_error": 0.7, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-04_Tomato_Bangalore", "date_predicted": "2026-07-03", "target_date": "2026-07-04", "commodity": "Tomato", "predicted_price": 42.73, "actual_price": 42.96, "error_rs": 0.23, "pct_error": 0.54, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-04_Onion_Bangalore", "date_predicted": "2026-07-03", "target_date": "2026-07-04", "commodity": "Onion", "predicted_price": 47.05, "actual_price": 46.86, "error_rs": -0.19, "pct_error": 0.41, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-04_Potato_Bangalore", "date_predicted": "2026-07-03", "target_date": "2026-07-04", "commodity": "Potato", "predicted_price": 31.88, "actual_price": 31.77, "error_rs": -0.11, "pct_error": 0.35, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-07-05_Tomato_Bangalore", "date_predicted": "2026-07-04", "target_date": "2026-07-05", "commodity": "Tomato", "predicted_price": 46.74, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-05_Onion_Bangalore", "date_predicted": "2026-07-04", "target_date": "2026-07-05", "commodity": "Onion", "predicted_price": 50.06, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-05_Potato_Bangalore", "date_predicted": "2026-07-04", "target_date": "2026-07-05", "commodity": "Potato", "predicted_price": 33.16, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-07_Onion_Bangalore", "date_predicted": "2026-07-06", "target_date": "2026-07-07", "commodity": "Onion", "predicted_price": 52.05, "actual_price": 52.04, "error_rs": -0.01, "pct_error": 0.02, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-07_Potato_Bangalore", "date_predicted": "2026-07-06", "target_date": "2026-07-07", "commodity": "Potato", "predicted_price": 33.98, "actual_price": 33.94, "error_rs": -0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-07_Tomato_Bangalore", "date_predicted": "2026-07-06", "target_date": "2026-07-07", "commodity": "Tomato", "predicted_price": 48.81, "actual_price": 48.74, "error_rs": -0.07, "pct_error": 0.14, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-08_Tomato_Bangalore", "date_predicted": "2026-07-07", "target_date": "2026-07-08", "commodity": "Tomato", "predicted_price": 41.06, "actual_price": 46.37, "error_rs": 5.31, "pct_error": 11.45, "is_direction_correct": true, "is_within_5pct": false, "is_within_10pct": false, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-08_Onion_Bangalore", "date_predicted": "2026-07-07", "target_date": "2026-07-08", "commodity": "Onion", "predicted_price": 50.02, "actual_price": 50.18, "error_rs": 0.16, "pct_error": 0.32, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-08_Potato_Bangalore", "date_predicted": "2026-07-07", "target_date": "2026-07-08", "commodity": "Potato", "predicted_price": 33.17, "actual_price": 33.21, "error_rs": 0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-09_Tomato_Bangalore", "date_predicted": "2026-07-08", "target_date": "2026-07-09", "commodity": "Tomato", "predicted_price": 44.11, "actual_price": 43.68, "error_rs": -0.43, "pct_error": 0.98, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-09_Onion_Bangalore", "date_predicted": "2026-07-08", "target_date": "2026-07-09", "commodity": "Onion", "predicted_price": 47.86, "actual_price": 47.71, "error_rs": -0.15, "pct_error": 0.31, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-09_Potato_Bangalore", "date_predicted": "2026-07-08", "target_date": "2026-07-09", "commodity": "Potato", "predicted_price": 32.2, "actual_price": 32.14, "error_rs": -0.06, "pct_error": 0.19, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-10_Potato_Bangalore", "date_predicted": "2026-07-09", "target_date": "2026-07-10", "commodity": "Potato", "predicted_price": 32.04, "actual_price": 32.08, "error_rs": 0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-10_Tomato_Bangalore", "date_predicted": "2026-07-09", "target_date": "2026-07-10", "commodity": "Tomato", "predicted_price": 44.07, "actual_price": 44.03, "error_rs": -0.04, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-10_Onion_Bangalore", "date_predicted": "2026-07-09", "target_date": "2026-07-10", "commodity": "Onion", "predicted_price": 47.76, "actual_price": 47.73, "error_rs": -0.03, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-11_Potato_Bangalore", "date_predicted": "2026-07-10", "target_date": "2026-07-11", "commodity": "Potato", "predicted_price": 33.16, "actual_price": 33.18, "error_rs": 0.02, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-11_Onion_Bangalore", "date_predicted": "2026-07-10", "target_date": "2026-07-11", "commodity": "Onion", "predicted_price": 50.42, "actual_price": 50.37, "error_rs": -0.05, "pct_error": 0.1, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-11_Tomato_Bangalore", "date_predicted": "2026-07-10", "target_date": "2026-07-11", "commodity": "Tomato", "predicted_price": 47.4, "actual_price": 47.13, "error_rs": -0.27, "pct_error": 0.57, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-12_Tomato_Bangalore", "date_predicted": "2026-07-11", "target_date": "2026-07-12", "commodity": "Tomato", "predicted_price": 47.04, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-12_Onion_Bangalore", "date_predicted": "2026-07-11", "target_date": "2026-07-12", "commodity": "Onion", "predicted_price": 51.09, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-12_Potato_Bangalore", "date_predicted": "2026-07-11", "target_date": "2026-07-12", "commodity": "Potato", "predicted_price": 33.41, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-14_Tomato_Bangalore", "date_predicted": "2026-07-13", "target_date": "2026-07-14", "commodity": "Tomato", "predicted_price": 44.55, "actual_price": 45.09, "error_rs": 0.54, "pct_error": 1.2, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-14_Onion_Bangalore", "date_predicted": "2026-07-13", "target_date": "2026-07-14", "commodity": "Onion", "predicted_price": 48.95, "actual_price": 48.95, "error_rs": 0.0, "pct_error": 0.0, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-14_Potato_Bangalore", "date_predicted": "2026-07-13", "target_date": "2026-07-14", "commodity": "Potato", "predicted_price": 32.61, "actual_price": 32.64, "error_rs": 0.03, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-15_Onion_Bangalore", "date_predicted": "2026-07-14", "target_date": "2026-07-15", "commodity": "Onion", "predicted_price": 47.21, "actual_price": 47.54, "error_rs": 0.33, "pct_error": 0.69, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-15_Potato_Bangalore", "date_predicted": "2026-07-14", "target_date": "2026-07-15", "commodity": "Potato", "predicted_price": 31.97, "actual_price": 32.01, "error_rs": 0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-15_Tomato_Bangalore", "date_predicted": "2026-07-14", "target_date": "2026-07-15", "commodity": "Tomato", "predicted_price": 43.27, "actual_price": 43.68, "error_rs": 0.41, "pct_error": 0.94, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-16_Tomato_Bangalore", "date_predicted": "2026-07-15", "target_date": "2026-07-16", "commodity": "Tomato", "predicted_price": 45.31, "actual_price": 45.61, "error_rs": 0.3, "pct_error": 0.66, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-16_Onion_Bangalore", "date_predicted": "2026-07-15", "target_date": "2026-07-16", "commodity": "Onion", "predicted_price": 49.33, "actual_price": 49.05, "error_rs": -0.28, "pct_error": 0.57, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-16_Potato_Bangalore", "date_predicted": "2026-07-15", "target_date": "2026-07-16", "commodity": "Potato", "predicted_price": 32.74, "actual_price": 32.61, "error_rs": -0.13, "pct_error": 0.4, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-17_Tomato_Bangalore", "date_predicted": "2026-07-16", "target_date": "2026-07-17", "commodity": "Tomato", "predicted_price": 47.98, "actual_price": 48.88, "error_rs": 0.9, "pct_error": 1.84, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-17_Onion_Bangalore", "date_predicted": "2026-07-16", "target_date": "2026-07-17", "commodity": "Onion", "predicted_price": 51.8, "actual_price": 52.02, "error_rs": 0.22, "pct_error": 0.42, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-17_Potato_Bangalore", "date_predicted": "2026-07-16", "target_date": "2026-07-17", "commodity": "Potato", "predicted_price": 33.77, "actual_price": 33.87, "error_rs": 0.1, "pct_error": 0.3, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-18_Potato_Bangalore", "date_predicted": "2026-07-17", "target_date": "2026-07-18", "commodity": "Potato", "predicted_price": 34.44, "actual_price": 34.43, "error_rs": -0.01, "pct_error": 0.03, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-18_Tomato_Bangalore", "date_predicted": "2026-07-17", "target_date": "2026-07-18", "commodity": "Tomato", "predicted_price": 49.77, "actual_price": 49.84, "error_rs": 0.07, "pct_error": 0.14, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-18_Onion_Bangalore", "date_predicted": "2026-07-17", "target_date": "2026-07-18", "commodity": "Onion", "predicted_price": 52.87, "actual_price": 53.19, "error_rs": 0.32, "pct_error": 0.6, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-19_Onion_Bangalore", "date_predicted": "2026-07-18", "target_date": "2026-07-19", "commodity": "Onion", "predicted_price": 49.96, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-19_Potato_Bangalore", "date_predicted": "2026-07-18", "target_date": "2026-07-19", "commodity": "Potato", "predicted_price": 33.07, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-19_Tomato_Bangalore", "date_predicted": "2026-07-18", "target_date": "2026-07-19", "commodity": "Tomato", "predicted_price": 45.31, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-21_Onion_Bangalore", "date_predicted": "2026-07-20", "target_date": "2026-07-21", "commodity": "Onion", "predicted_price": 48.7, "actual_price": 48.67, "error_rs": -0.03, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-21_Potato_Bangalore", "date_predicted": "2026-07-20", "target_date": "2026-07-21", "commodity": "Potato", "predicted_price": 32.57, "actual_price": 32.52, "error_rs": -0.05, "pct_error": 0.15, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-21_Tomato_Bangalore", "date_predicted": "2026-07-20", "target_date": "2026-07-21", "commodity": "Tomato", "predicted_price": 43.61, "actual_price": 44.79, "error_rs": 1.18, "pct_error": 2.63, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-07-22_Tomato_Bangalore", "date_predicted": "2026-07-21", "target_date": "2026-07-22", "commodity": "Tomato", "predicted_price": 47.99, "actual_price": 47.53, "error_rs": -0.46, "pct_error": 0.97, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-22_Onion_Bangalore", "date_predicted": "2026-07-21", "target_date": "2026-07-22", "commodity": "Onion", "predicted_price": 51.11, "actual_price": 50.92, "error_rs": -0.19, "pct_error": 0.37, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-22_Potato_Bangalore", "date_predicted": "2026-07-21", "target_date": "2026-07-22", "commodity": "Potato", "predicted_price": 33.47, "actual_price": 33.43, "error_rs": -0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-23_Tomato_Bangalore", "date_predicted": "2026-07-22", "target_date": "2026-07-23", "commodity": "Tomato", "predicted_price": 49.64, "actual_price": 50.02, "error_rs": 0.38, "pct_error": 0.76, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Transport Logistics & Diesel Freight Pass-Through"}, {"prediction_id": "2026-07-23_Onion_Bangalore", "date_predicted": "2026-07-22", "target_date": "2026-07-23", "commodity": "Onion", "predicted_price": 53.01, "actual_price": 53.29, "error_rs": 0.28, "pct_error": 0.53, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-23_Potato_Bangalore", "date_predicted": "2026-07-22", "target_date": "2026-07-23", "commodity": "Potato", "predicted_price": 34.38, "actual_price": 34.46, "error_rs": 0.08, "pct_error": 0.23, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-24_Tomato_Bangalore", "date_predicted": "2026-07-23", "target_date": "2026-07-24", "commodity": "Tomato", "predicted_price": 49.45, "actual_price": 49.26, "error_rs": -0.19, "pct_error": 0.39, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-24_Onion_Bangalore", "date_predicted": "2026-07-23", "target_date": "2026-07-24", "commodity": "Onion", "predicted_price": 53.09, "actual_price": 52.92, "error_rs": -0.17, "pct_error": 0.32, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-24_Potato_Bangalore", "date_predicted": "2026-07-23", "target_date": "2026-07-24", "commodity": "Potato", "predicted_price": 34.38, "actual_price": 34.36, "error_rs": -0.02, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-25_Potato_Bangalore", "date_predicted": "2026-07-24", "target_date": "2026-07-25", "commodity": "Potato", "predicted_price": 33.24, "actual_price": 33.23, "error_rs": -0.01, "pct_error": 0.03, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-25_Onion_Bangalore", "date_predicted": "2026-07-24", "target_date": "2026-07-25", "commodity": "Onion", "predicted_price": 50.36, "actual_price": 50.19, "error_rs": -0.17, "pct_error": 0.34, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-25_Tomato_Bangalore", "date_predicted": "2026-07-24", "target_date": "2026-07-25", "commodity": "Tomato", "predicted_price": 45.2, "actual_price": 46.12, "error_rs": 0.92, "pct_error": 1.99, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-26_Tomato_Bangalore", "date_predicted": "2026-07-25", "target_date": "2026-07-26", "commodity": "Tomato", "predicted_price": 44.87, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-07-26_Onion_Bangalore", "date_predicted": "2026-07-25", "target_date": "2026-07-26", "commodity": "Onion", "predicted_price": 49.95, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-26_Potato_Bangalore", "date_predicted": "2026-07-25", "target_date": "2026-07-26", "commodity": "Potato", "predicted_price": 33.02, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-07-28_Tomato_Bangalore", "date_predicted": "2026-07-27", "target_date": "2026-07-28", "commodity": "Tomato", "predicted_price": 49.51, "actual_price": 49.23, "error_rs": -0.28, "pct_error": 0.57, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-28_Onion_Bangalore", "date_predicted": "2026-07-27", "target_date": "2026-07-28", "commodity": "Onion", "predicted_price": 52.68, "actual_price": 52.61, "error_rs": -0.07, "pct_error": 0.13, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-28_Potato_Bangalore", "date_predicted": "2026-07-27", "target_date": "2026-07-28", "commodity": "Potato", "predicted_price": 34.23, "actual_price": 34.18, "error_rs": -0.05, "pct_error": 0.15, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-29_Tomato_Bangalore", "date_predicted": "2026-07-28", "target_date": "2026-07-29", "commodity": "Tomato", "predicted_price": 50.36, "actual_price": 50.29, "error_rs": -0.07, "pct_error": 0.14, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-29_Onion_Bangalore", "date_predicted": "2026-07-28", "target_date": "2026-07-29", "commodity": "Onion", "predicted_price": 54.07, "actual_price": 53.75, "error_rs": -0.32, "pct_error": 0.6, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-07-29_Potato_Bangalore", "date_predicted": "2026-07-28", "target_date": "2026-07-29", "commodity": "Potato", "predicted_price": 34.71, "actual_price": 34.7, "error_rs": -0.01, "pct_error": 0.03, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-30_Potato_Bangalore", "date_predicted": "2026-07-29", "target_date": "2026-07-30", "commodity": "Potato", "predicted_price": 33.9, "actual_price": 33.98, "error_rs": 0.08, "pct_error": 0.24, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-30_Onion_Bangalore", "date_predicted": "2026-07-29", "target_date": "2026-07-30", "commodity": "Onion", "predicted_price": 51.73, "actual_price": 51.94, "error_rs": 0.21, "pct_error": 0.4, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-30_Tomato_Bangalore", "date_predicted": "2026-07-29", "target_date": "2026-07-30", "commodity": "Tomato", "predicted_price": 46.4, "actual_price": 48.02, "error_rs": 1.62, "pct_error": 3.37, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-31_Tomato_Bangalore", "date_predicted": "2026-07-30", "target_date": "2026-07-31", "commodity": "Tomato", "predicted_price": 44.36, "actual_price": 44.93, "error_rs": 0.57, "pct_error": 1.27, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-31_Onion_Bangalore", "date_predicted": "2026-07-30", "target_date": "2026-07-31", "commodity": "Onion", "predicted_price": 49.52, "actual_price": 49.09, "error_rs": -0.43, "pct_error": 0.88, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-07-31_Potato_Bangalore", "date_predicted": "2026-07-30", "target_date": "2026-07-31", "commodity": "Potato", "predicted_price": 32.8, "actual_price": 32.75, "error_rs": -0.05, "pct_error": 0.15, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-01_Tomato_Bangalore", "date_predicted": "2026-07-31", "target_date": "2026-08-01", "commodity": "Tomato", "predicted_price": 42.8, "actual_price": 44.54, "error_rs": 1.74, "pct_error": 3.91, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-01_Onion_Bangalore", "date_predicted": "2026-07-31", "target_date": "2026-08-01", "commodity": "Onion", "predicted_price": 48.48, "actual_price": 48.41, "error_rs": -0.07, "pct_error": 0.14, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-01_Potato_Bangalore", "date_predicted": "2026-07-31", "target_date": "2026-08-01", "commodity": "Potato", "predicted_price": 32.45, "actual_price": 32.4, "error_rs": -0.05, "pct_error": 0.15, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-02_Tomato_Bangalore", "date_predicted": "2026-08-01", "target_date": "2026-08-02", "commodity": "Tomato", "predicted_price": 48.45, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-02_Onion_Bangalore", "date_predicted": "2026-08-01", "target_date": "2026-08-02", "commodity": "Onion", "predicted_price": 51.77, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-02_Potato_Bangalore", "date_predicted": "2026-08-01", "target_date": "2026-08-02", "commodity": "Potato", "predicted_price": 33.84, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-04_Potato_Bangalore", "date_predicted": "2026-08-03", "target_date": "2026-08-04", "commodity": "Potato", "predicted_price": 34.25, "actual_price": 34.21, "error_rs": -0.04, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-04_Onion_Bangalore", "date_predicted": "2026-08-03", "target_date": "2026-08-04", "commodity": "Onion", "predicted_price": 52.91, "actual_price": 52.65, "error_rs": -0.26, "pct_error": 0.49, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-04_Tomato_Bangalore", "date_predicted": "2026-08-03", "target_date": "2026-08-04", "commodity": "Tomato", "predicted_price": 49.24, "actual_price": 49.17, "error_rs": -0.07, "pct_error": 0.14, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-05_Tomato_Bangalore", "date_predicted": "2026-08-04", "target_date": "2026-08-05", "commodity": "Tomato", "predicted_price": 46.26, "actual_price": 46.29, "error_rs": 0.03, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-05_Onion_Bangalore", "date_predicted": "2026-08-04", "target_date": "2026-08-05", "commodity": "Onion", "predicted_price": 50.31, "actual_price": 50.25, "error_rs": -0.06, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-05_Potato_Bangalore", "date_predicted": "2026-08-04", "target_date": "2026-08-05", "commodity": "Potato", "predicted_price": 33.24, "actual_price": 33.23, "error_rs": -0.01, "pct_error": 0.03, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-06_Tomato_Bangalore", "date_predicted": "2026-08-05", "target_date": "2026-08-06", "commodity": "Tomato", "predicted_price": 43.87, "actual_price": 44.17, "error_rs": 0.3, "pct_error": 0.68, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-06_Onion_Bangalore", "date_predicted": "2026-08-05", "target_date": "2026-08-06", "commodity": "Onion", "predicted_price": 48.35, "actual_price": 48.19, "error_rs": -0.16, "pct_error": 0.33, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-06_Potato_Bangalore", "date_predicted": "2026-08-05", "target_date": "2026-08-06", "commodity": "Potato", "predicted_price": 32.34, "actual_price": 32.32, "error_rs": -0.02, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-07_Tomato_Bangalore", "date_predicted": "2026-08-06", "target_date": "2026-08-07", "commodity": "Tomato", "predicted_price": 45.79, "actual_price": 45.43, "error_rs": -0.36, "pct_error": 0.79, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-07_Onion_Bangalore", "date_predicted": "2026-08-06", "target_date": "2026-08-07", "commodity": "Onion", "predicted_price": 49.2, "actual_price": 49.03, "error_rs": -0.17, "pct_error": 0.35, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-07_Potato_Bangalore", "date_predicted": "2026-08-06", "target_date": "2026-08-07", "commodity": "Potato", "predicted_price": 32.71, "actual_price": 32.62, "error_rs": -0.09, "pct_error": 0.28, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-08_Potato_Bangalore", "date_predicted": "2026-08-07", "target_date": "2026-08-08", "commodity": "Potato", "predicted_price": 33.79, "actual_price": 33.82, "error_rs": 0.03, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-08_Tomato_Bangalore", "date_predicted": "2026-08-07", "target_date": "2026-08-08", "commodity": "Tomato", "predicted_price": 48.6, "actual_price": 48.64, "error_rs": 0.04, "pct_error": 0.08, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-08_Onion_Bangalore", "date_predicted": "2026-08-07", "target_date": "2026-08-08", "commodity": "Onion", "predicted_price": 51.76, "actual_price": 51.86, "error_rs": 0.1, "pct_error": 0.19, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-09_Tomato_Bangalore", "date_predicted": "2026-08-08", "target_date": "2026-08-09", "commodity": "Tomato", "predicted_price": 48.15, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-09_Onion_Bangalore", "date_predicted": "2026-08-08", "target_date": "2026-08-09", "commodity": "Onion", "predicted_price": 52.04, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-09_Potato_Bangalore", "date_predicted": "2026-08-08", "target_date": "2026-08-09", "commodity": "Potato", "predicted_price": 33.56, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-11_Tomato_Bangalore", "date_predicted": "2026-08-10", "target_date": "2026-08-11", "commodity": "Tomato", "predicted_price": 45.08, "actual_price": 44.71, "error_rs": -0.37, "pct_error": 0.83, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-11_Onion_Bangalore", "date_predicted": "2026-08-10", "target_date": "2026-08-11", "commodity": "Onion", "predicted_price": 48.83, "actual_price": 48.7, "error_rs": -0.13, "pct_error": 0.27, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-11_Potato_Bangalore", "date_predicted": "2026-08-10", "target_date": "2026-08-11", "commodity": "Potato", "predicted_price": 32.57, "actual_price": 32.54, "error_rs": -0.03, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-12_Onion_Bangalore", "date_predicted": "2026-08-11", "target_date": "2026-08-12", "commodity": "Onion", "predicted_price": 47.71, "actual_price": 47.91, "error_rs": 0.2, "pct_error": 0.42, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-12_Potato_Bangalore", "date_predicted": "2026-08-11", "target_date": "2026-08-12", "commodity": "Potato", "predicted_price": 32.11, "actual_price": 32.17, "error_rs": 0.06, "pct_error": 0.19, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-08-12_Tomato_Bangalore", "date_predicted": "2026-08-11", "target_date": "2026-08-12", "commodity": "Tomato", "predicted_price": 42.82, "actual_price": 44.09, "error_rs": 1.27, "pct_error": 2.88, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Transport Logistics & Diesel Freight Pass-Through"}, {"prediction_id": "2026-08-13_Tomato_Bangalore", "date_predicted": "2026-08-12", "target_date": "2026-08-13", "commodity": "Tomato", "predicted_price": 47.24, "actual_price": 46.65, "error_rs": -0.59, "pct_error": 1.26, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-13_Onion_Bangalore", "date_predicted": "2026-08-12", "target_date": "2026-08-13", "commodity": "Onion", "predicted_price": 50.35, "actual_price": 50.01, "error_rs": -0.34, "pct_error": 0.68, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-13_Potato_Bangalore", "date_predicted": "2026-08-12", "target_date": "2026-08-13", "commodity": "Potato", "predicted_price": 33.09, "actual_price": 33.02, "error_rs": -0.07, "pct_error": 0.21, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-14_Tomato_Bangalore", "date_predicted": "2026-08-13", "target_date": "2026-08-14", "commodity": "Tomato", "predicted_price": 49.14, "actual_price": 49.48, "error_rs": 0.34, "pct_error": 0.69, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-14_Onion_Bangalore", "date_predicted": "2026-08-13", "target_date": "2026-08-14", "commodity": "Onion", "predicted_price": 52.76, "actual_price": 52.67, "error_rs": -0.09, "pct_error": 0.17, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-14_Potato_Bangalore", "date_predicted": "2026-08-13", "target_date": "2026-08-14", "commodity": "Potato", "predicted_price": 34.15, "actual_price": 34.17, "error_rs": 0.02, "pct_error": 0.06, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-15_Potato_Bangalore", "date_predicted": "2026-08-14", "target_date": "2026-08-15", "commodity": "Potato", "predicted_price": 34.28, "actual_price": 34.31, "error_rs": 0.03, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-15_Tomato_Bangalore", "date_predicted": "2026-08-14", "target_date": "2026-08-15", "commodity": "Tomato", "predicted_price": 49.35, "actual_price": 49.29, "error_rs": -0.06, "pct_error": 0.12, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-15_Onion_Bangalore", "date_predicted": "2026-08-14", "target_date": "2026-08-15", "commodity": "Onion", "predicted_price": 53.03, "actual_price": 52.82, "error_rs": -0.21, "pct_error": 0.4, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-16_Potato_Bangalore", "date_predicted": "2026-08-15", "target_date": "2026-08-16", "commodity": "Potato", "predicted_price": 32.88, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-16_Tomato_Bangalore", "date_predicted": "2026-08-15", "target_date": "2026-08-16", "commodity": "Tomato", "predicted_price": 45.97, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-16_Onion_Bangalore", "date_predicted": "2026-08-15", "target_date": "2026-08-16", "commodity": "Onion", "predicted_price": 49.45, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-18_Tomato_Bangalore", "date_predicted": "2026-08-17", "target_date": "2026-08-18", "commodity": "Tomato", "predicted_price": 43.25, "actual_price": 45.08, "error_rs": 1.83, "pct_error": 4.06, "is_direction_correct": false, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-18_Onion_Bangalore", "date_predicted": "2026-08-17", "target_date": "2026-08-18", "commodity": "Onion", "predicted_price": 48.38, "actual_price": 48.89, "error_rs": 0.51, "pct_error": 1.04, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-18_Potato_Bangalore", "date_predicted": "2026-08-17", "target_date": "2026-08-18", "commodity": "Potato", "predicted_price": 32.56, "actual_price": 32.62, "error_rs": 0.06, "pct_error": 0.18, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-19_Tomato_Bangalore", "date_predicted": "2026-08-18", "target_date": "2026-08-19", "commodity": "Tomato", "predicted_price": 48.24, "actual_price": 47.97, "error_rs": -0.27, "pct_error": 0.56, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-19_Onion_Bangalore", "date_predicted": "2026-08-18", "target_date": "2026-08-19", "commodity": "Onion", "predicted_price": 51.43, "actual_price": 51.31, "error_rs": -0.12, "pct_error": 0.23, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-19_Potato_Bangalore", "date_predicted": "2026-08-18", "target_date": "2026-08-19", "commodity": "Potato", "predicted_price": 33.65, "actual_price": 33.62, "error_rs": -0.03, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-20_Potato_Bangalore", "date_predicted": "2026-08-19", "target_date": "2026-08-20", "commodity": "Potato", "predicted_price": 34.23, "actual_price": 34.34, "error_rs": 0.11, "pct_error": 0.32, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Production Seasonality & Crop Harvest Cycles"}, {"prediction_id": "2026-08-20_Tomato_Bangalore", "date_predicted": "2026-08-19", "target_date": "2026-08-20", "commodity": "Tomato", "predicted_price": 49.15, "actual_price": 49.56, "error_rs": 0.41, "pct_error": 0.83, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Transport Logistics & Diesel Freight Pass-Through"}, {"prediction_id": "2026-08-20_Onion_Bangalore", "date_predicted": "2026-08-19", "target_date": "2026-08-20", "commodity": "Onion", "predicted_price": 52.8, "actual_price": 52.92, "error_rs": 0.12, "pct_error": 0.23, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-21_Tomato_Bangalore", "date_predicted": "2026-08-20", "target_date": "2026-08-21", "commodity": "Tomato", "predicted_price": 46.57, "actual_price": 47.74, "error_rs": 1.17, "pct_error": 2.45, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-21_Onion_Bangalore", "date_predicted": "2026-08-20", "target_date": "2026-08-21", "commodity": "Onion", "predicted_price": 51.42, "actual_price": 51.53, "error_rs": 0.11, "pct_error": 0.21, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-21_Potato_Bangalore", "date_predicted": "2026-08-20", "target_date": "2026-08-21", "commodity": "Potato", "predicted_price": 33.78, "actual_price": 33.81, "error_rs": 0.03, "pct_error": 0.09, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-22_Tomato_Bangalore", "date_predicted": "2026-08-21", "target_date": "2026-08-22", "commodity": "Tomato", "predicted_price": 45.06, "actual_price": 44.44, "error_rs": -0.62, "pct_error": 1.4, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-22_Onion_Bangalore", "date_predicted": "2026-08-21", "target_date": "2026-08-22", "commodity": "Onion", "predicted_price": 48.93, "actual_price": 48.55, "error_rs": -0.38, "pct_error": 0.78, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-22_Potato_Bangalore", "date_predicted": "2026-08-21", "target_date": "2026-08-22", "commodity": "Potato", "predicted_price": 32.6, "actual_price": 32.54, "error_rs": -0.06, "pct_error": 0.18, "is_direction_correct": true, "is_within_5pct": true, "is_within_10pct": true, "status": "VERIFIED", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-23_Onion_Bangalore", "date_predicted": "2026-08-22", "target_date": "2026-08-23", "commodity": "Onion", "predicted_price": 49.73, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-23_Tomato_Bangalore", "date_predicted": "2026-08-22", "target_date": "2026-08-23", "commodity": "Tomato", "predicted_price": 44.83, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-23_Potato_Bangalore", "date_predicted": "2026-08-22", "target_date": "2026-08-23", "commodity": "Potato", "predicted_price": 32.95, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-26_Onion_Bangalore", "date_predicted": "2026-08-25", "target_date": "2026-08-26", "commodity": "Onion", "predicted_price": 52.32, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-26_Tomato_Bangalore", "date_predicted": "2026-08-25", "target_date": "2026-08-26", "commodity": "Tomato", "predicted_price": 26.76, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-26_Potato_Bangalore", "date_predicted": "2026-08-25", "target_date": "2026-08-26", "commodity": "Potato", "predicted_price": 32.95, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-27_Onion_Bangalore", "date_predicted": "2026-08-26", "target_date": "2026-08-27", "commodity": "Onion", "predicted_price": 52.64, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-27_Tomato_Bangalore", "date_predicted": "2026-08-26", "target_date": "2026-08-27", "commodity": "Tomato", "predicted_price": 19.3, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}, {"prediction_id": "2026-08-27_Potato_Bangalore", "date_predicted": "2026-08-26", "target_date": "2026-08-27", "commodity": "Potato", "predicted_price": 24.31, "actual_price": null, "error_rs": null, "pct_error": null, "is_direction_correct": null, "is_within_5pct": false, "is_within_10pct": false, "status": "PENDING", "primary_driver": "Market Momentum, Spreads & Wholesale-Retail Transmission"}], "live_cards": {"Tomato": {"commodity": "Tomato", "today_price": 27.5, "today_range": {"avg": 27.5, "low": 27.0, "high": 28.0, "str": "\u20b927.0\u201328.0"}, "tomorrow_price": 19.3, "tomorrow_range": {"avg": 19.3, "low": 18.8, "high": 19.8, "str": "\u20b918.8\u201319.8"}, "delta": -8.2, "trend": "Decreasing", "trend_icon": "DOWN", "early_warning_status": "[PRICE DROP EXPECTED]", "trajectory": {"d0": {"avg": 27.5, "low": 27.0, "high": 28.0, "str": "\u20b927.0\u201328.0"}, "d1": {"avg": 19.3, "low": 18.8, "high": 19.8, "str": "\u20b918.8\u201319.8"}, "d3": {"avg": 27.94, "low": 27.4, "high": 28.4, "str": "\u20b927.4\u201328.4"}, "d7": {"avg": 28.05, "low": 27.6, "high": 28.6, "str": "\u20b927.6\u201328.6"}, "d14": {"avg": 28.0, "low": 27.5, "high": 28.5, "str": "\u20b927.5\u201328.5"}}, "causes": ["Moderate rain in Kolar (12.6mm/3d) & Chikkaballapur (24.8mm/3d) slowing daily mandi picking operations.", "Heavy mandi arrival glut (+86.8% above 30-day baseline at 550t/day) putting strong downward pressure on prices.", "Operation Greens 50% freight subsidy supporting farmgate transport during low rates"], "advice": "WAIT TO BUY: Tomato prices expected to ease by Rs.8.20/kg due to buffer releases & fresh arrivals. Defer non-urgent bulk buying."}, "Onion": {"commodity": "Onion", "today_price": 50.0, "today_range": {"avg": 50.0, "low": 49.5, "high": 50.5, "str": "\u20b949.5\u201350.5"}, "tomorrow_price": 52.64, "tomorrow_range": {"avg": 52.64, "low": 52.1, "high": 53.1, "str": "\u20b952.1\u201353.1"}, "delta": 2.64, "trend": "Increasing", "trend_icon": "UP", "early_warning_status": "[STABLE MARKET]", "trajectory": {"d0": {"avg": 50.0, "low": 49.5, "high": 50.5, "str": "\u20b949.5\u201350.5"}, "d1": {"avg": 52.64, "low": 52.1, "high": 53.1, "str": "\u20b952.1\u201353.1"}, "d3": {"avg": 50.71, "low": 50.2, "high": 51.2, "str": "\u20b950.2\u201351.2"}, "d7": {"avg": 51.2, "low": 50.7, "high": 51.7, "str": "\u20b950.7\u201351.7"}, "d14": {"avg": 51.42, "low": 50.9, "high": 51.9, "str": "\u20b950.9\u201351.9"}}, "causes": ["Unseasonal rains in Nashik / Maharashtra onion tract (31.8mm/7d) damaging standing crop & stored Rabi stocks.", "NAFED/NCCF open market buffer releases (Bharat Onion @ Rs.25/kg) actively suppressing market spikes.", "Peak seasonal harvest arrivals landing in Bangalore mandis."], "advice": "Prices stable around Rs.50.00/kg. Normal daily buying recommended."}, "Potato": {"commodity": "Potato", "today_price": 25.0, "today_range": {"avg": 25.0, "low": 24.5, "high": 25.5, "str": "\u20b924.5\u201325.5"}, "tomorrow_price": 24.31, "tomorrow_range": {"avg": 24.31, "low": 23.8, "high": 24.8, "str": "\u20b923.8\u201324.8"}, "delta": -0.69, "trend": "Decreasing", "trend_icon": "DOWN", "early_warning_status": "[STABLE MARKET]", "trajectory": {"d0": {"avg": 25.0, "low": 24.5, "high": 25.5, "str": "\u20b924.5\u201325.5"}, "d1": {"avg": 24.31, "low": 23.8, "high": 24.8, "str": "\u20b923.8\u201324.8"}, "d3": {"avg": 24.95, "low": 24.4, "high": 25.4, "str": "\u20b924.4\u201325.4"}, "d7": {"avg": 24.92, "low": 24.4, "high": 25.4, "str": "\u20b924.4\u201325.4"}, "d14": {"avg": 24.9, "low": 24.4, "high": 25.4, "str": "\u20b924.4\u201325.4"}}, "causes": ["Operation Greens transport subsidy active", "Mid-season equilibrium arrival cycle matching normal seasonal baseline", "Stable diesel at Rs.89.64/L (Transit freight: Rs.2.39/kg)"], "advice": "Prices stable around Rs.25.00/kg. Normal daily buying recommended."}}, "last_updated": "August 26, 2026 - 22:19:22 IST", "retrain_info": "Last Retrained: 2026-08-25 11:46:53 (8,121 rows)"};
+
+        let currentCommodity = "all";
+        let timeSeriesChartInstance = null;
+        let errorDistributionChartInstance = null;
+
+        // Initialize Dashboard
+        window.addEventListener("DOMContentLoaded", () => {
+            renderKPIs();
+            renderTrajectoryCards();
+            renderTimeSeriesChart();
+            renderErrorDistributionChart();
+            renderLedgerTable();
+        });
+
+        function switchCommodity(comm) {
+            currentCommodity = comm;
+            document.querySelectorAll(".tab-btn").forEach(btn => {
+                btn.classList.remove("active");
+                if (btn.textContent.includes(comm) || (comm === "all" && btn.textContent.includes("All"))) {
+                    btn.classList.add("active");
+                }
+            });
+            renderKPIs();
+            renderTrajectoryCards();
+            renderTimeSeriesChart();
+            renderErrorDistributionChart();
+            renderLedgerTable();
+        }
+
+        function renderKPIs() {
+            const metrics = DASHBOARD_DATA.metrics;
+            if (currentCommodity === "all") {
+                const ret = metrics.overall_retail || {};
+                const sum = metrics.summary || {};
+                document.getElementById("kpi-dir-acc").textContent = (ret.directional_accuracy_pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-mae").textContent = "₹ " + (ret.mae_rs_per_kg || 0).toFixed(2);
+                document.getElementById("kpi-mape").textContent = (ret.mape_pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-hit5").textContent = (ret.hit_rate_within_5pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-hit10").textContent = (ret.hit_rate_within_10pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-verified").innerHTML = (sum.total_verified || 0) + ` <span style="font-size: 13px; color: var(--text-muted);">/ ${sum.total_predictions || 0}</span>`;
+                document.getElementById("kpi-pending").textContent = (sum.pending_verifications || 0) + " Pending Next Day";
+            } else {
+                const commM = (metrics.by_commodity || {})[currentCommodity] || {};
+                document.getElementById("kpi-dir-acc").textContent = (commM.directional_accuracy_pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-mae").textContent = "₹ " + (commM.mae_retail_rs || 0).toFixed(2);
+                document.getElementById("kpi-mape").textContent = (commM.mape_retail_pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-hit5").textContent = (commM.hit_rate_5pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-hit10").textContent = (commM.hit_rate_10pct || 0).toFixed(1) + "%";
+                document.getElementById("kpi-verified").innerHTML = (commM.count || 0) + ` <span style="font-size: 13px; color: var(--text-muted);">Verified</span>`;
+                document.getElementById("kpi-pending").textContent = "Active Commodity Model";
+            }
+        }
+
+        function renderTrajectoryCards() {
+            const container = document.getElementById("trajectory-cards-container");
+            container.innerHTML = "";
+            const cards = DASHBOARD_DATA.live_cards || {};
+            const commoditiesToShow = currentCommodity === "all" ? ["Tomato", "Onion", "Potato"] : [currentCommodity];
+
+            commoditiesToShow.forEach(c => {
+                const item = cards[c];
+                if (!item) return;
+                const emoji = c === "Tomato" ? "🍅" : (c === "Onion" ? "🧅" : "🥔");
+                const sign = item.delta > 0 ? "+" : "";
+                
+                const causesHtml = item.causes.map(cause => `<div class="traj-cause-item">${cause}</div>`).join("");
+
+                const tLow = item.today_range ? item.today_range.low : item.today_price * 0.9;
+                const tHigh = item.today_range ? item.today_range.high : item.today_price * 1.1;
+                const pLow = item.tomorrow_range ? item.tomorrow_range.low : item.tomorrow_price * 0.9;
+                const pHigh = item.tomorrow_range ? item.tomorrow_range.high : item.tomorrow_price * 1.1;
+
+                const cardHtml = `
+                <div class="traj-card">
+                    <div class="traj-header">
+                        <div class="traj-title">${emoji} ${item.commodity}</div>
+                        <span class="pill pill-success">${item.early_warning_status}</span>
+                    </div>
+                    <div style="font-size: 13.5px; margin-bottom: 10px; line-height: 1.5;">
+                        <div>Today (Shop/App Range): <b class="font-mono" style="color: #ffffff;">₹${tLow.toFixed(0)} – ₹${tHigh.toFixed(0)} / kg</b> <span style="font-size: 11.5px; color: var(--text-muted);">(Avg: ₹${item.today_price.toFixed(1)})</span></div>
+                        <div style="margin-top: 3px;">Tomorrow Forecast: <b class="font-mono" style="color: var(--accent-green);">₹${pLow.toFixed(0)} – ₹${pHigh.toFixed(0)} / kg</b> <span style="font-size: 11.5px; color: var(--text-muted);">(Avg: ₹${item.tomorrow_price.toFixed(1)}, ${sign}₹${item.delta.toFixed(1)})</span></div>
+                    </div>
+                    <div class="traj-steps">
+                        <div class="step-item"><div class="step-label">Today D0</div><div class="step-val">${item.trajectory.d0.str || '₹' + item.trajectory.d0.avg.toFixed(0)}</div></div>
+                        <div class="step-item"><div class="step-label">D+1</div><div class="step-val" style="color: var(--accent-blue);">${item.trajectory.d1.str || '₹' + item.trajectory.d1.avg.toFixed(0)}</div></div>
+                        <div class="step-item"><div class="step-label">D+3</div><div class="step-val">${item.trajectory.d3.str || '₹' + item.trajectory.d3.avg.toFixed(0)}</div></div>
+                        <div class="step-item"><div class="step-label">D+7</div><div class="step-val">${item.trajectory.d7.str || '₹' + item.trajectory.d7.avg.toFixed(0)}</div></div>
+                        <div class="step-item"><div class="step-label">D+14</div><div class="step-val">${item.trajectory.d14.str || '₹' + item.trajectory.d14.avg.toFixed(0)}</div></div>
+                    </div>
+                    <div class="traj-cause-title">Identified Origin Causes:</div>
+                    ${causesHtml}
+                    <div class="traj-advice">💡 Shopping Advice: ${item.advice}</div>
+                </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function renderTimeSeriesChart() {
+            const ctx = document.getElementById("timeSeriesChart").getContext("2d");
+            if (timeSeriesChartInstance) timeSeriesChartInstance.destroy();
+
+            let records = DASHBOARD_DATA.ledger.filter(r => r.status === "VERIFIED");
+            if (currentCommodity !== "all") {
+                records = records.filter(r => r.commodity.toLowerCase() === currentCommodity.toLowerCase());
+            }
+            // Sort by target date
+            records.sort((a, b) => new Date(a.target_date) - new Date(b.target_date));
+
+            const labels = records.map(r => r.target_date);
+            const actualPrices = records.map(r => r.actual_price);
+            const predictedPrices = records.map(r => r.predicted_price);
+            const upperBand = records.map(r => r.predicted_price * 1.05);
+            const lowerBand = records.map(r => r.predicted_price * 0.95);
+
+            timeSeriesChartInstance = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: "Actual Price (₹/kg)",
+                            data: actualPrices,
+                            borderColor: "#ffffff",
+                            backgroundColor: "#ffffff",
+                            borderWidth: 2.2,
+                            pointRadius: 3,
+                            pointHoverRadius: 6,
+                            tension: 0.2,
+                        },
+                        {
+                            label: "Predicted Price (₹/kg)",
+                            data: predictedPrices,
+                            borderColor: "#3b82f6",
+                            backgroundColor: "rgba(59, 130, 246, 0.1)",
+                            borderWidth: 2.0,
+                            borderDash: [5, 5],
+                            pointRadius: 2.5,
+                            tension: 0.2,
+                        },
+                        {
+                            label: "±5% Tolerance Band (Upper)",
+                            data: upperBand,
+                            borderColor: "transparent",
+                            backgroundColor: "rgba(59, 130, 246, 0.08)",
+                            fill: "+1",
+                            pointRadius: 0,
+                        },
+                        {
+                            label: "±5% Tolerance Band (Lower)",
+                            data: lowerBand,
+                            borderColor: "transparent",
+                            backgroundColor: "transparent",
+                            pointRadius: 0,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: "index", intersect: false },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: "#94a3b8",
+                                filter: item => !item.text.includes("Lower")
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.parsed.y;
+                                    return context.dataset.label + ": ₹ " + val.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: "#64748b", maxTicksLimit: 12 },
+                            grid: { color: "rgba(51, 65, 85, 0.3)" }
+                        },
+                        y: {
+                            ticks: { color: "#64748b", callback: v => "₹" + v },
+                            grid: { color: "rgba(51, 65, 85, 0.3)" }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderErrorDistributionChart() {
+            const ctx = document.getElementById("errorDistributionChart").getContext("2d");
+            if (errorDistributionChartInstance) errorDistributionChartInstance.destroy();
+
+            let records = DASHBOARD_DATA.ledger.filter(r => r.status === "VERIFIED" && r.error_rs !== null);
+            if (currentCommodity !== "all") {
+                records = records.filter(r => r.commodity.toLowerCase() === currentCommodity.toLowerCase());
+            }
+
+            const buckets = {
+                "<-3₹": 0,
+                "-3 to -1₹": 0,
+                "-1 to 0₹": 0,
+                "0 to +1₹": 0,
+                "+1 to +3₹": 0,
+                ">+3₹": 0
+            };
+
+            records.forEach(r => {
+                const e = r.error_rs;
+                if (e < -3) buckets["<-3₹"]++;
+                else if (e < -1) buckets["-3 to -1₹"]++;
+                else if (e <= 0) buckets["-1 to 0₹"]++;
+                else if (e <= 1) buckets["0 to +1₹"]++;
+                else if (e <= 3) buckets["+1 to +3₹"]++;
+                else buckets[">+3₹"]++;
+            });
+
+            errorDistributionChartInstance = new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(buckets),
+                    datasets: [{
+                        label: "Number of Forecasts",
+                        data: Object.values(buckets),
+                        backgroundColor: [
+                            "rgba(239, 68, 68, 0.6)",
+                            "rgba(245, 158, 11, 0.6)",
+                            "rgba(16, 185, 129, 0.8)",
+                            "rgba(16, 185, 129, 0.8)",
+                            "rgba(245, 158, 11, 0.6)",
+                            "rgba(239, 68, 68, 0.6)"
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: "#64748b" }, grid: { display: false } },
+                        y: { ticks: { color: "#64748b", precision: 0 }, grid: { color: "rgba(51, 65, 85, 0.3)" } }
+                    }
+                }
+            });
+        }
+
+        function renderLedgerTable() {
+            const tbody = document.getElementById("ledger-table-body");
+            tbody.innerHTML = "";
+            const searchVal = document.getElementById("tableSearchInput").value.toLowerCase();
+            const statusFilter = document.getElementById("tableStatusFilter").value;
+
+            let records = [...DASHBOARD_DATA.ledger].reverse();
+
+            if (currentCommodity !== "all") {
+                records = records.filter(r => r.commodity.toLowerCase() === currentCommodity.toLowerCase());
+            }
+
+            if (statusFilter === "VERIFIED") records = records.filter(r => r.status === "VERIFIED");
+            if (statusFilter === "PENDING") records = records.filter(r => r.status === "PENDING");
+            if (statusFilter === "CORRECT") records = records.filter(r => r.is_within_5pct);
+
+            if (searchVal) {
+                records = records.filter(r => 
+                    r.target_date.toLowerCase().includes(searchVal) ||
+                    r.primary_driver.toLowerCase().includes(searchVal) ||
+                    r.commodity.toLowerCase().includes(searchVal)
+                );
+            }
+
+            if (records.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 24px;">No matching records found.</td></tr>`;
+                return;
+            }
+
+            records.slice(0, 50).forEach(r => {
+                const badgeClass = "badge-" + r.commodity.toLowerCase();
+                let actStr = '<span style="color: var(--text-muted);">Awaiting Market</span>';
+                let errStr = '<span style="color: var(--text-muted);">—</span>';
+                let statusPill = '<span class="pill pill-pending">PENDING NEXT DAY</span>';
+                let dirPill = '<span style="color: var(--text-muted);">—</span>';
+
+                if (r.status === "VERIFIED") {
+                    actStr = `₹ ${r.actual_price.toFixed(2)}`;
+                    errStr = `${r.error_rs > 0 ? "+" : ""}${r.error_rs.toFixed(2)} ₹ (${r.pct_error.toFixed(1)}%)`;
+                    
+                    if (r.is_within_5pct) {
+                        statusPill = '<span class="pill pill-success">CORRECT (±5%)</span>';
+                    } else if (r.is_within_10pct) {
+                        statusPill = '<span class="pill pill-warning">TOLERABLE (±10%)</span>';
+                    } else {
+                        statusPill = '<span class="pill pill-danger">MISSED (>10%)</span>';
+                    }
+
+                    dirPill = r.is_direction_correct ? 
+                        '<span class="pill pill-success">MATCH</span>' : 
+                        '<span class="pill pill-danger">MISSED</span>';
+                }
+
+                const tr = `
+                <tr>
+                    <td class="font-mono">${r.target_date}</td>
+                    <td><span class="badge ${badgeClass}">${r.commodity}</span></td>
+                    <td class="font-mono" style="font-weight: 700;">₹ ${r.predicted_price.toFixed(2)}</td>
+                    <td class="font-mono">${actStr}</td>
+                    <td class="font-mono">${errStr}</td>
+                    <td>${dirPill}</td>
+                    <td>${statusPill}</td>
+                    <td style="font-size: 12px; color: var(--text-secondary); max-width: 240px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${r.primary_driver}">${r.primary_driver}</td>
+                </tr>
+                `;
+                tbody.innerHTML += tr;
+            });
+        }
+
+        function filterLedgerTable() {
+            renderLedgerTable();
+        }
+    </script>
+</body>
+</html>

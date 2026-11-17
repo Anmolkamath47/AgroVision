@@ -1,0 +1,122 @@
+[
+  {
+    "Experiment": "Exp 1: Price Features Only",
+    "Commodity": "Tomato",
+    "Features_Count": 48,
+    "MAE": 0.5198,
+    "RMSE": 0.8595,
+    "MAPE": 3.16,
+    "sMAPE": 3.12,
+    "Directional_Accuracy": 92.86
+  },
+  {
+    "Experiment": "Exp 1: Price Features Only",
+    "Commodity": "Onion",
+    "Features_Count": 48,
+    "MAE": 0.3897,
+    "RMSE": 0.547,
+    "MAPE": 1.82,
+    "sMAPE": 1.81,
+    "Directional_Accuracy": 95.57
+  },
+  {
+    "Experiment": "Exp 1: Price Features Only",
+    "Commodity": "Potato",
+    "Features_Count": 48,
+    "MAE": 0.1484,
+    "RMSE": 0.1979,
+    "MAPE": 0.83,
+    "sMAPE": 0.83,
+    "Directional_Accuracy": 97.78
+  },
+  {
+    "Experiment": "Exp 2: Price + Calendar Features",
+    "Commodity": "Tomato",
+    "Features_Count": 85,
+    "MAE": 0.5977,
+    "RMSE": 0.8472,
+    "MAPE": 3.8,
+    "sMAPE": 3.7,
+    "Directional_Accuracy": 90.89
+  },
+  {
+    "Experiment": "Exp 2: Price + Calendar Features",
+    "Commodity": "Onion",
+    "Features_Count": 85,
+    "MAE": 0.4454,
+    "RMSE": 0.6276,
+    "MAPE": 2.11,
+    "sMAPE": 2.09,
+    "Directional_Accuracy": 95.57
+  },
+  {
+    "Experiment": "Exp 2: Price + Calendar Features",
+    "Commodity": "Potato",
+    "Features_Count": 85,
+    "MAE": 0.1126,
+    "RMSE": 0.1516,
+    "MAPE": 0.63,
+    "sMAPE": 0.63,
+    "Directional_Accuracy": 98.03
+  },
+  {
+    "Experiment": "Exp 3: Price + Calendar + Cross-Commodity",
+    "Commodity": "Tomato",
+    "Features_Count": 91,
+    "MAE": 0.4938,
+    "RMSE": 0.8274,
+    "MAPE": 3.01,
+    "sMAPE": 2.95,
+    "Directional_Accuracy": 92.12
+  },
+  {
+    "Experiment": "Exp 3: Price + Calendar + Cross-Commodity",
+    "Commodity": "Onion",
+    "Features_Count": 91,
+    "MAE": 0.3974,
+    "RMSE": 0.6183,
+    "MAPE": 1.88,
+    "sMAPE": 1.86,
+    "Directional_Accuracy": 96.06
+  },
+  {
+    "Experiment": "Exp 3: Price + Calendar + Cross-Commodity",
+    "Commodity": "Potato",
+    "Features_Count": 91,
+    "MAE": 0.1118,
+    "RMSE": 0.151,
+    "MAPE": 0.63,
+    "sMAPE": 0.63,
+    "Directional_Accuracy": 98.28
+  },
+  {
+    "Experiment": "Exp 4: Multi-Factor Economist Model (Weather, Fuel, Policies)",
+    "Commodity": "Tomato",
+    "Features_Count": 221,
+    "MAE": 0.3658,
+    "RMSE": 0.5922,
+    "MAPE": 2.16,
+    "sMAPE": 2.14,
+    "Directional_Accuracy": 96.31
+  },
+  {
+    "Experiment": "Exp 4: Multi-Factor Economist Model (Weather, Fuel, Policies)",
+    "Commodity": "Onion",
+    "Features_Count": 221,
+    "MAE": 0.3525,
+    "RMSE": 0.5489,
+    "MAPE": 1.64,
+    "sMAPE": 1.63,
+    "Directional_Accuracy": 97.04
+  },
+  {
+    "Experiment": "Exp 4: Multi-Factor Economist Model (Weather, Fuel, Policies)",
+    "Commodity": "Potato",
+    "Features_Count": 221,
+    "MAE": 0.1202,
+    "RMSE": 0.1638,
+    "MAPE": 0.67,
+    "sMAPE": 0.67,
+    "Directional_Accuracy": 98.52
+  }
+]

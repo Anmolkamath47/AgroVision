@@ -1,0 +1,110 @@
+{
+  "schema_valid": true,
+  "missing_required_columns": [],
+  "missing_values": {
+    "arrival_date": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "state": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "district": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "market": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "commodity": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "min_price": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "max_price": {
+      "count": 0,
+      "percentage": 0.0
+    },
+    "modal_price": {
+      "count": 0,
+      "percentage": 0.0
+    }
+  },
+  "exact_duplicates": 0,
+  "business_key_duplicates": 0,
+  "invalid_dates_count": 0,
+  "date_range": {
+    "earliest": "2021-01-01",
+    "latest": "2026-08-20"
+  },
+  "price_validation": {
+    "min_price": {
+      "negative_count": 0,
+      "zero_count": 0,
+      "nan_count": 0,
+      "min": 160.0,
+      "max": 9625.0,
+      "mean": 1684.8961378332888
+    },
+    "max_price": {
+      "negative_count": 0,
+      "zero_count": 0,
+      "nan_count": 0,
+      "min": 300.0,
+      "max": 12375.0,
+      "mean": 2330.4962795641777
+    },
+    "modal_price": {
+      "negative_count": 0,
+      "zero_count": 0,
+      "nan_count": 0,
+      "min": 230.0,
+      "max": 11000.0,
+      "mean": 2027.725551421738
+    },
+    "hierarchy_violations_count": 0
+  },
+  "commodities_present": [
+    "Onion",
+    "Potato",
+    "Tomato"
+  ],
+  "markets_present": [
+    "Bangalore",
+    "Ramanagara APMC"
+  ],
+  "target_commodities_found": [
+    "Tomato",
+    "Onion",
+    "Potato"
+  ],
+  "commodity_breakdown": {
+    "Tomato": {
+      "total_records": 1648,
+      "unique_dates": 1648,
+      "earliest_date": "2021-01-01",
+      "latest_date": "2026-08-20",
+      "avg_modal_price_quintal": 2151.93
+    },
+    "Onion": {
+      "total_records": 1055,
+      "unique_dates": 1055,
+      "earliest_date": "2021-01-01",
+      "latest_date": "2025-10-29",
+      "avg_modal_price_quintal": 1915.06
+    },
+    "Potato": {
+      "total_records": 1060,
+      "unique_dates": 1060,
+      "earliest_date": "2021-01-01",
+      "latest_date": "2025-10-08",
+      "avg_modal_price_quintal": 1946.75
+    }
+  },
+  "status": "PASS"
+}

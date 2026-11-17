@@ -1,0 +1,438 @@
+{
+  "last_retrained_at": "2026-08-25 11:46:53",
+  "last_sample_count": 8121,
+  "history": [
+    {
+      "retrained_at": "2026-11-17 19:55:59 IST",
+      "date": "2026-11-17",
+      "samples_count": 8369,
+      "tomato_mae": 0.9435,
+      "onion_mae": 0.4912,
+      "potato_mae": 0.2088,
+      "directional_accuracy": 85.28,
+      "reason": "Daily automated continuous retraining with verified actuals on 2026-11-17",
+      "status": "SUCCESS",
+      "delta_metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.9783,
+            "RMSE": 1.5637,
+            "MAPE": 4.81,
+            "sMAPE": 4.85,
+            "Directional_Accuracy": 76.61
+          },
+          "retail": {
+            "MAE": 0.9435,
+            "RMSE": 1.4403,
+            "MAPE": 2.98,
+            "sMAPE": 3.0,
+            "Directional_Accuracy": 80.67
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.5264,
+            "RMSE": 1.0687,
+            "MAPE": 1.72,
+            "sMAPE": 1.74,
+            "Directional_Accuracy": 81.15
+          },
+          "retail": {
+            "MAE": 0.4912,
+            "RMSE": 0.867,
+            "MAPE": 1.15,
+            "sMAPE": 1.15,
+            "Directional_Accuracy": 85.68
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.293,
+            "RMSE": 0.5746,
+            "MAPE": 1.29,
+            "sMAPE": 1.31,
+            "Directional_Accuracy": 80.91
+          },
+          "retail": {
+            "MAE": 0.2088,
+            "RMSE": 0.4166,
+            "MAPE": 0.7,
+            "sMAPE": 0.7,
+            "Directional_Accuracy": 89.5
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-25 11:46:53",
+      "reason": "Initial model training baseline not recorded in log.",
+      "total_samples": 8121,
+      "verified_predictions_count": 150,
+      "commodities": [
+        "Tomato",
+        "Onion",
+        "Potato"
+      ],
+      "metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.4623,
+            "RMSE": 0.9053,
+            "MAPE": 2.57,
+            "sMAPE": 2.46,
+            "Directional_Accuracy": 92.63
+          },
+          "retail": {
+            "MAE": 0.7748,
+            "RMSE": 1.4436,
+            "MAPE": 2.16,
+            "sMAPE": 2.17,
+            "Directional_Accuracy": 95.58
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.3383,
+            "RMSE": 0.4959,
+            "MAPE": 1.43,
+            "sMAPE": 1.42,
+            "Directional_Accuracy": 97.05
+          },
+          "retail": {
+            "MAE": 0.2724,
+            "RMSE": 0.4191,
+            "MAPE": 0.73,
+            "sMAPE": 0.72,
+            "Directional_Accuracy": 96.07
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.1257,
+            "RMSE": 0.2929,
+            "MAPE": 0.65,
+            "sMAPE": 0.64,
+            "Directional_Accuracy": 97.05
+          },
+          "retail": {
+            "MAE": 0.0703,
+            "RMSE": 0.1781,
+            "MAPE": 0.24,
+            "sMAPE": 0.24,
+            "Directional_Accuracy": 97.79
+          }
+        }
+      }
+    }
+  ],
+  "last_verified_count": 150,
+  "runs": [
+    {
+      "retrained_at": "2026-11-17 20:39:13 IST",
+      "date": "2026-11-17",
+      "samples_count": 8369,
+      "tomato_mae": 0.9435,
+      "onion_mae": 0.4912,
+      "potato_mae": 0.2088,
+      "directional_accuracy": 85.28,
+      "reason": "Daily automated continuous retraining with verified actuals on 2026-11-17",
+      "status": "SUCCESS",
+      "delta_metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.9783,
+            "RMSE": 1.5637,
+            "MAPE": 4.81,
+            "sMAPE": 4.85,
+            "Directional_Accuracy": 76.61
+          },
+          "retail": {
+            "MAE": 0.9435,
+            "RMSE": 1.4403,
+            "MAPE": 2.98,
+            "sMAPE": 3.0,
+            "Directional_Accuracy": 80.67
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.5264,
+            "RMSE": 1.0687,
+            "MAPE": 1.72,
+            "sMAPE": 1.74,
+            "Directional_Accuracy": 81.15
+          },
+          "retail": {
+            "MAE": 0.4912,
+            "RMSE": 0.867,
+            "MAPE": 1.15,
+            "sMAPE": 1.15,
+            "Directional_Accuracy": 85.68
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.293,
+            "RMSE": 0.5746,
+            "MAPE": 1.29,
+            "sMAPE": 1.31,
+            "Directional_Accuracy": 80.91
+          },
+          "retail": {
+            "MAE": 0.2088,
+            "RMSE": 0.4166,
+            "MAPE": 0.7,
+            "sMAPE": 0.7,
+            "Directional_Accuracy": 89.5
+          }
+        }
+      }
+    },
+    {
+      "retrained_at": "2026-11-17 20:13:11 IST",
+      "date": "2026-11-17",
+      "samples_count": 8369,
+      "tomato_mae": 0.9435,
+      "onion_mae": 0.4912,
+      "potato_mae": 0.2088,
+      "directional_accuracy": 85.28,
+      "reason": "Daily automated continuous retraining with verified actuals on 2026-11-17",
+      "status": "SUCCESS",
+      "delta_metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.9783,
+            "RMSE": 1.5637,
+            "MAPE": 4.81,
+            "sMAPE": 4.85,
+            "Directional_Accuracy": 76.61
+          },
+          "retail": {
+            "MAE": 0.9435,
+            "RMSE": 1.4403,
+            "MAPE": 2.98,
+            "sMAPE": 3.0,
+            "Directional_Accuracy": 80.67
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.5264,
+            "RMSE": 1.0687,
+            "MAPE": 1.72,
+            "sMAPE": 1.74,
+            "Directional_Accuracy": 81.15
+          },
+          "retail": {
+            "MAE": 0.4912,
+            "RMSE": 0.867,
+            "MAPE": 1.15,
+            "sMAPE": 1.15,
+            "Directional_Accuracy": 85.68
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.293,
+            "RMSE": 0.5746,
+            "MAPE": 1.29,
+            "sMAPE": 1.31,
+            "Directional_Accuracy": 80.91
+          },
+          "retail": {
+            "MAE": 0.2088,
+            "RMSE": 0.4166,
+            "MAPE": 0.7,
+            "sMAPE": 0.7,
+            "Directional_Accuracy": 89.5
+          }
+        }
+      }
+    },
+    {
+      "retrained_at": "2026-11-17 19:57:32 IST",
+      "date": "2026-11-17",
+      "samples_count": 8369,
+      "tomato_mae": 0.9435,
+      "onion_mae": 0.4912,
+      "potato_mae": 0.2088,
+      "directional_accuracy": 85.28,
+      "reason": "Daily automated continuous retraining with verified actuals on 2026-11-17",
+      "status": "SUCCESS",
+      "delta_metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.9783,
+            "RMSE": 1.5637,
+            "MAPE": 4.81,
+            "sMAPE": 4.85,
+            "Directional_Accuracy": 76.61
+          },
+          "retail": {
+            "MAE": 0.9435,
+            "RMSE": 1.4403,
+            "MAPE": 2.98,
+            "sMAPE": 3.0,
+            "Directional_Accuracy": 80.67
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.5264,
+            "RMSE": 1.0687,
+            "MAPE": 1.72,
+            "sMAPE": 1.74,
+            "Directional_Accuracy": 81.15
+          },
+          "retail": {
+            "MAE": 0.4912,
+            "RMSE": 0.867,
+            "MAPE": 1.15,
+            "sMAPE": 1.15,
+            "Directional_Accuracy": 85.68
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.293,
+            "RMSE": 0.5746,
+            "MAPE": 1.29,
+            "sMAPE": 1.31,
+            "Directional_Accuracy": 80.91
+          },
+          "retail": {
+            "MAE": 0.2088,
+            "RMSE": 0.4166,
+            "MAPE": 0.7,
+            "sMAPE": 0.7,
+            "Directional_Accuracy": 89.5
+          }
+        }
+      }
+    },
+    {
+      "retrained_at": "2026-11-17 19:55:59 IST",
+      "date": "2026-11-17",
+      "samples_count": 8369,
+      "tomato_mae": 0.9435,
+      "onion_mae": 0.4912,
+      "potato_mae": 0.2088,
+      "directional_accuracy": 85.28,
+      "reason": "Daily automated continuous retraining with verified actuals on 2026-11-17",
+      "status": "SUCCESS",
+      "delta_metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.9783,
+            "RMSE": 1.5637,
+            "MAPE": 4.81,
+            "sMAPE": 4.85,
+            "Directional_Accuracy": 76.61
+          },
+          "retail": {
+            "MAE": 0.9435,
+            "RMSE": 1.4403,
+            "MAPE": 2.98,
+            "sMAPE": 3.0,
+            "Directional_Accuracy": 80.67
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.5264,
+            "RMSE": 1.0687,
+            "MAPE": 1.72,
+            "sMAPE": 1.74,
+            "Directional_Accuracy": 81.15
+          },
+          "retail": {
+            "MAE": 0.4912,
+            "RMSE": 0.867,
+            "MAPE": 1.15,
+            "sMAPE": 1.15,
+            "Directional_Accuracy": 85.68
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.293,
+            "RMSE": 0.5746,
+            "MAPE": 1.29,
+            "sMAPE": 1.31,
+            "Directional_Accuracy": 80.91
+          },
+          "retail": {
+            "MAE": 0.2088,
+            "RMSE": 0.4166,
+            "MAPE": 0.7,
+            "sMAPE": 0.7,
+            "Directional_Accuracy": 89.5
+          }
+        }
+      }
+    },
+    {
+      "timestamp": "2026-08-25 11:46:53",
+      "reason": "Initial model training baseline not recorded in log.",
+      "total_samples": 8121,
+      "verified_predictions_count": 150,
+      "commodities": [
+        "Tomato",
+        "Onion",
+        "Potato"
+      ],
+      "metrics": {
+        "Tomato": {
+          "wholesale": {
+            "MAE": 0.4623,
+            "RMSE": 0.9053,
+            "MAPE": 2.57,
+            "sMAPE": 2.46,
+            "Directional_Accuracy": 92.63
+          },
+          "retail": {
+            "MAE": 0.7748,
+            "RMSE": 1.4436,
+            "MAPE": 2.16,
+            "sMAPE": 2.17,
+            "Directional_Accuracy": 95.58
+          }
+        },
+        "Onion": {
+          "wholesale": {
+            "MAE": 0.3383,
+            "RMSE": 0.4959,
+            "MAPE": 1.43,
+            "sMAPE": 1.42,
+            "Directional_Accuracy": 97.05
+          },
+          "retail": {
+            "MAE": 0.2724,
+            "RMSE": 0.4191,
+            "MAPE": 0.73,
+            "sMAPE": 0.72,
+            "Directional_Accuracy": 96.07
+          }
+        },
+        "Potato": {
+          "wholesale": {
+            "MAE": 0.1257,
+            "RMSE": 0.2929,
+            "MAPE": 0.65,
+            "sMAPE": 0.64,
+            "Directional_Accuracy": 97.05
+          },
+          "retail": {
+            "MAE": 0.0703,
+            "RMSE": 0.1781,
+            "MAPE": 0.24,
+            "sMAPE": 0.24,
+            "Directional_Accuracy": 97.79
+          }
+        }
+      }
+    }
+  ],
+  "last_run_at": "2026-11-17 20:39:13 IST",
+  "total_runs": 4
+}

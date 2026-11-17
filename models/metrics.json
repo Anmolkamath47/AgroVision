@@ -1,0 +1,236 @@
+{
+  "Tomato": {
+    "test_samples": 248,
+    "test_date_range": "2025-02-04 to 2026-08-21",
+    "baselines": {
+      "Persistence": {
+        "MAE": 1.8125,
+        "RMSE": 2.7761,
+        "MAPE": 12.1,
+        "sMAPE": 11.82,
+        "Directional_Accuracy": 16.13
+      },
+      "7_Day_Moving_Average": {
+        "MAE": 2.3564,
+        "RMSE": 3.3237,
+        "MAPE": 15.53,
+        "sMAPE": 14.56,
+        "Directional_Accuracy": 49.19
+      }
+    },
+    "xgboost": {
+      "MAE": 2.0771,
+      "RMSE": 2.8304,
+      "MAPE": 14.91,
+      "sMAPE": 13.62,
+      "Directional_Accuracy": 45.56
+    },
+    "wholesale_metrics": {
+      "MAE": 2.0771,
+      "RMSE": 2.8304,
+      "MAPE": 14.91,
+      "sMAPE": 13.62,
+      "Directional_Accuracy": 45.56
+    },
+    "retail_metrics": {
+      "MAE": 2.1918,
+      "RMSE": 3.0954,
+      "MAPE": 7.56,
+      "sMAPE": 7.31,
+      "Directional_Accuracy": 50.4
+    },
+    "residual_diagnostics": {
+      "mean_bias": -0.619,
+      "std_error": 2.762,
+      "p90_error": 4.77,
+      "p95_error": 5.53,
+      "max_absolute_error": 13.59,
+      "underpredicted_days_count": 80,
+      "overpredicted_days_count": 132,
+      "accurate_within_50paise_count": 36,
+      "bias_interpretation": "Slight Overprediction"
+    },
+    "retail_residual_diagnostics": {
+      "mean_bias": -0.664,
+      "std_error": 3.023,
+      "p90_error": 4.69,
+      "p95_error": 6.01,
+      "max_absolute_error": 17.57
+    },
+    "top_features": {
+      "retail_max_price_per_kg": 0.2564,
+      "retail_price_per_kg": 0.2109,
+      "retail_min_price_per_kg": 0.1934,
+      "modal_price_per_kg": 0.0802,
+      "min_price_per_kg": 0.0725,
+      "max_price_per_kg": 0.0622,
+      "rolling_min_7": 0.0273,
+      "wholesale_retail_spread": 0.0067,
+      "price_lag_1": 0.0053,
+      "retail_price_lag_1": 0.0045,
+      "transmission_ratio_7d": 0.0035,
+      "nashik_rain_7d_sum": 0.0028,
+      "nashik_rain_3d_sum": 0.0022,
+      "wholesale_retail_spread_lag_1": 0.0019,
+      "nashik_rain_14d_sum": 0.0015
+    },
+    "conformal_quantile_90": 4.77,
+    "conformal_quantile_90_retail": 4.69
+  },
+  "Onion": {
+    "test_samples": 159,
+    "test_date_range": "2024-07-02 to 2025-10-29",
+    "baselines": {
+      "Persistence": {
+        "MAE": 4.0434,
+        "RMSE": 7.4513,
+        "MAPE": 12.09,
+        "sMAPE": 11.44,
+        "Directional_Accuracy": 37.11
+      },
+      "7_Day_Moving_Average": {
+        "MAE": 4.6312,
+        "RMSE": 6.8141,
+        "MAPE": 14.65,
+        "sMAPE": 14.13,
+        "Directional_Accuracy": 42.77
+      }
+    },
+    "xgboost": {
+      "MAE": 4.8621,
+      "RMSE": 8.175,
+      "MAPE": 13.21,
+      "sMAPE": 14.66,
+      "Directional_Accuracy": 33.96
+    },
+    "wholesale_metrics": {
+      "MAE": 4.8621,
+      "RMSE": 8.175,
+      "MAPE": 13.21,
+      "sMAPE": 14.66,
+      "Directional_Accuracy": 33.96
+    },
+    "retail_metrics": {
+      "MAE": 4.4991,
+      "RMSE": 7.9458,
+      "MAPE": 7.91,
+      "sMAPE": 8.58,
+      "Directional_Accuracy": 54.72
+    },
+    "residual_diagnostics": {
+      "mean_bias": 3.345,
+      "std_error": 7.459,
+      "p90_error": 14.33,
+      "p95_error": 20.17,
+      "max_absolute_error": 34.36,
+      "underpredicted_days_count": 91,
+      "overpredicted_days_count": 46,
+      "accurate_within_50paise_count": 22,
+      "bias_interpretation": "Slight Underprediction"
+    },
+    "retail_residual_diagnostics": {
+      "mean_bias": 3.054,
+      "std_error": 7.335,
+      "p90_error": 14.12,
+      "p95_error": 19.43,
+      "max_absolute_error": 33.76
+    },
+    "top_features": {
+      "min_price_per_kg": 0.3556,
+      "modal_price_per_kg": 0.1805,
+      "retail_price_per_kg": 0.0873,
+      "max_price_per_kg": 0.0613,
+      "retail_min_price_per_kg": 0.0568,
+      "retail_max_price_per_kg": 0.0362,
+      "tomato_supply_cycle_index": 0.0247,
+      "month_cos": 0.0139,
+      "retail_rolling_min_7": 0.0091,
+      "quarter": 0.0075,
+      "onion_supply_cycle_index": 0.0052,
+      "price_lag_14": 0.0045,
+      "diesel_price_lag_7": 0.0043,
+      "rolling_min_7": 0.0031,
+      "supply_cycle_index": 0.0031
+    },
+    "conformal_quantile_90": 14.33,
+    "conformal_quantile_90_retail": 14.12
+  },
+  "Potato": {
+    "test_samples": 159,
+    "test_date_range": "2024-05-28 to 2025-10-08",
+    "baselines": {
+      "Persistence": {
+        "MAE": 1.8479,
+        "RMSE": 3.853,
+        "MAPE": 6.41,
+        "sMAPE": 6.3,
+        "Directional_Accuracy": 56.6
+      },
+      "7_Day_Moving_Average": {
+        "MAE": 2.6946,
+        "RMSE": 4.1446,
+        "MAPE": 9.64,
+        "sMAPE": 9.53,
+        "Directional_Accuracy": 27.04
+      }
+    },
+    "xgboost": {
+      "MAE": 5.1428,
+      "RMSE": 6.5146,
+      "MAPE": 16.64,
+      "sMAPE": 18.82,
+      "Directional_Accuracy": 23.27
+    },
+    "wholesale_metrics": {
+      "MAE": 5.1428,
+      "RMSE": 6.5146,
+      "MAPE": 16.64,
+      "sMAPE": 18.82,
+      "Directional_Accuracy": 23.27
+    },
+    "retail_metrics": {
+      "MAE": 5.5284,
+      "RMSE": 6.8623,
+      "MAPE": 12.59,
+      "sMAPE": 13.81,
+      "Directional_Accuracy": 54.72
+    },
+    "residual_diagnostics": {
+      "mean_bias": 4.938,
+      "std_error": 4.249,
+      "p90_error": 9.03,
+      "p95_error": 12.79,
+      "max_absolute_error": 22.83,
+      "underpredicted_days_count": 133,
+      "overpredicted_days_count": 11,
+      "accurate_within_50paise_count": 15,
+      "bias_interpretation": "Slight Underprediction"
+    },
+    "retail_residual_diagnostics": {
+      "mean_bias": 5.377,
+      "std_error": 4.264,
+      "p90_error": 10.36,
+      "p95_error": 11.01,
+      "max_absolute_error": 23.43
+    },
+    "top_features": {
+      "retail_rolling_min_7": 0.258,
+      "retail_price_per_kg": 0.1412,
+      "retail_min_price_per_kg": 0.1094,
+      "rolling_mean_7": 0.0951,
+      "retail_price_lag_1": 0.0294,
+      "modal_price_per_kg": 0.028,
+      "retail_price_lag_2": 0.0235,
+      "price_lag_2": 0.022,
+      "min_price_per_kg": 0.0164,
+      "rolling_mean_14": 0.0135,
+      "max_price_per_kg": 0.0133,
+      "rolling_min_7": 0.0091,
+      "freight_cost_onion_per_kg": 0.0069,
+      "retail_rolling_mean_7": 0.0068,
+      "retail_rolling_mean_14": 0.0068
+    },
+    "conformal_quantile_90": 9.03,
+    "conformal_quantile_90_retail": 10.36
+  }
+}

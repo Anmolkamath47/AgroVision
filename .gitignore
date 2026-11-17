@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+env/
+venv/
+ENV/
+.venv/
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Temporary / Scratch files
+scratch/
+*.log
+.pytest_cache/
+.ipynb_checkpoints/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

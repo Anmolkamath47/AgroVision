@@ -1,0 +1,131 @@
+{
+  "Tomato": {
+    "train_samples": 2288,
+    "test_samples": 404,
+    "features_count": 226,
+    "spike_classifier_7d": {
+      "roc_auc": 0.9998,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1_score": 0.8889,
+      "brier_score": 0.0144,
+      "test_positive_rate": 0.0792,
+      "scale_pos_weight": 8.26
+    },
+    "crash_classifier_7d": {
+      "roc_auc": 0.9941,
+      "precision": 0.878,
+      "recall": 0.9231,
+      "f1_score": 0.9,
+      "brier_score": 0.0151,
+      "test_positive_rate": 0.0965,
+      "scale_pos_weight": 7.06
+    },
+    "regressor_3d": {
+      "mae": 0.792,
+      "rmse": 1.384,
+      "smape": 2.25
+    },
+    "regressor_7d": {
+      "mae": 1.459,
+      "rmse": 2.986,
+      "smape": 3.84
+    },
+    "regressor_14d": {
+      "mae": 2.631,
+      "rmse": 6.858,
+      "smape": 6.02
+    },
+    "peak_regressor_14d": {
+      "mae": 1.745,
+      "rmse": 3.874,
+      "smape": 3.85
+    }
+  },
+  "Onion": {
+    "train_samples": 2288,
+    "test_samples": 404,
+    "features_count": 226,
+    "spike_classifier_7d": {
+      "roc_auc": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "brier_score": 0.0011,
+      "test_positive_rate": 0.0347,
+      "scale_pos_weight": 19.99
+    },
+    "crash_classifier_7d": {
+      "roc_auc": 0.9975,
+      "precision": 0.75,
+      "recall": 0.9545,
+      "f1_score": 0.84,
+      "brier_score": 0.0128,
+      "test_positive_rate": 0.0545,
+      "scale_pos_weight": 13.76
+    },
+    "regressor_3d": {
+      "mae": 0.578,
+      "rmse": 0.724,
+      "smape": 1.54
+    },
+    "regressor_7d": {
+      "mae": 0.613,
+      "rmse": 0.836,
+      "smape": 1.59
+    },
+    "regressor_14d": {
+      "mae": 0.707,
+      "rmse": 0.868,
+      "smape": 1.89
+    },
+    "peak_regressor_14d": {
+      "mae": 0.382,
+      "rmse": 0.483,
+      "smape": 0.92
+    }
+  },
+  "Potato": {
+    "train_samples": 2288,
+    "test_samples": 404,
+    "features_count": 226,
+    "spike_classifier_7d": {
+      "roc_auc": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "brier_score": 0.0,
+      "test_positive_rate": 0.0,
+      "scale_pos_weight": 2288.0
+    },
+    "crash_classifier_7d": {
+      "roc_auc": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "brier_score": 0.0,
+      "test_positive_rate": 0.0,
+      "scale_pos_weight": 2288.0
+    },
+    "regressor_3d": {
+      "mae": 0.218,
+      "rmse": 0.279,
+      "smape": 0.78
+    },
+    "regressor_7d": {
+      "mae": 0.196,
+      "rmse": 0.261,
+      "smape": 0.69
+    },
+    "regressor_14d": {
+      "mae": 0.228,
+      "rmse": 0.278,
+      "smape": 0.81
+    },
+    "peak_regressor_14d": {
+      "mae": 0.13,
+      "rmse": 0.163,
+      "smape": 0.44
+    }
+  }
+}

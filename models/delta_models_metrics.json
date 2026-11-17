@@ -1,0 +1,50 @@
+{
+  "Tomato": {
+    "wholesale": {
+      "MAE": 0.9783,
+      "RMSE": 1.5637,
+      "MAPE": 4.81,
+      "sMAPE": 4.85,
+      "Directional_Accuracy": 76.61
+    },
+    "retail": {
+      "MAE": 0.9435,
+      "RMSE": 1.4403,
+      "MAPE": 2.98,
+      "sMAPE": 3.0,
+      "Directional_Accuracy": 80.67
+    }
+  },
+  "Onion": {
+    "wholesale": {
+      "MAE": 0.5264,
+      "RMSE": 1.0687,
+      "MAPE": 1.72,
+      "sMAPE": 1.74,
+      "Directional_Accuracy": 81.15
+    },
+    "retail": {
+      "MAE": 0.4912,
+      "RMSE": 0.867,
+      "MAPE": 1.15,
+      "sMAPE": 1.15,
+      "Directional_Accuracy": 85.68
+    }
+  },
+  "Potato": {
+    "wholesale": {
+      "MAE": 0.293,
+      "RMSE": 0.5746,
+      "MAPE": 1.29,
+      "sMAPE": 1.31,
+      "Directional_Accuracy": 80.91
+    },
+    "retail": {
+      "MAE": 0.2088,
+      "RMSE": 0.4166,
+      "MAPE": 0.7,
+      "sMAPE": 0.7,
+      "Directional_Accuracy": 89.5
+    }
+  }
+}

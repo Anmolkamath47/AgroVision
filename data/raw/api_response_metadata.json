@@ -1,0 +1,13 @@
+{
+  "collected_at": "2026-08-24T21:36:11.090146",
+  "total_records": 8144,
+  "commodities": [
+    "Tomato",
+    "Onion",
+    "Potato"
+  ],
+  "location": "Bangalore, Karnataka, India",
+  "historical_source": "AGMARKNET (Ashoka CEDA Archive)",
+  "live_source": "data.gov.in OGD Mandi API",
+  "price_unit": "INR / quintal"
+}

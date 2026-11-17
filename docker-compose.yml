@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: agrovision-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: agrovision
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - agrovision_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agrovision"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agrovision-web
+    restart: always
+    environment:
+      PORT: 5001
+      HOST: 0.0.0.0
+      FLASK_ENV: production
+      DATABASE_URL: postgresql://postgres:postgrespassword@db:5432/agrovision
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: agrovision
+      DB_USER: postgres
+      DB_PASSWORD: postgrespassword
+    ports:
+      - "5001:5001"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+
+volumes:
+  agrovision_pgdata:
+    driver: local
