@@ -243,11 +243,93 @@ body {
   margin-top: 1px;
 }
 
+/* Real-Time Live Status Dot Indicator */
+.live-status-dot-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--status-positive);
+  background: var(--status-positive-bg);
+  border: 1px solid var(--status-positive-border);
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--status-positive);
+  box-shadow: 0 0 6px var(--status-positive);
+  animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+
+/* Modern Segmented Navigation Tab Switcher */
+.nav-segmented-tabs {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-surface-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  gap: 4px;
+}
+
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: var(--radius-xs);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  white-space: nowrap;
+}
+
+.nav-tab svg {
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+}
+
+.nav-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface-hover);
+}
+
+.nav-tab:hover svg {
+  color: var(--text-primary);
+}
+
+.nav-tab.active {
+  background: var(--bg-card);
+  color: var(--brand-primary);
+  border-color: var(--border-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-tab.active svg {
+  color: var(--brand-primary);
+}
+
 .top-nav-actions {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .session-badge {
@@ -760,6 +842,24 @@ body {
   color: var(--text-muted);
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.footer-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.footer-link:hover {
+  color: var(--brand-primary);
+  text-decoration: underline;
 }
 
 /* ==========================================================================
@@ -1286,5 +1386,21 @@ body {
   color: #EF4444;
   border: 1px solid rgba(239, 68, 68, 0.35);
 }
+
+@media (max-width: 860px) {
+  .top-nav-bar {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .nav-segmented-tabs {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+  }
+  .top-nav-actions {
+    margin-left: auto;
+  }
+}
+
 
 

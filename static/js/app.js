@@ -108,61 +108,53 @@ function initClock() {
 }
 
 /**
- * View Switcher: Toggles between Audit Ledger & Live Market Radar
+ * Switch View: Clean Tab Navigation between Audit Ledger & Live Market Radar
  */
-function toggleMainView() {
+function switchView(targetView) {
+  currentView = targetView;
   const ledgerView = document.getElementById('view-audit-ledger');
   const radarView = document.getElementById('view-market-radar');
-  const badgeText = document.getElementById('brand-badge-text');
-  const subText = document.getElementById('brand-sub-text');
-  const toggleBtnText = document.getElementById('btn-view-toggle-text');
-  const verifyBtn = document.getElementById('btn-verify-actuals');
-  const refreshBtn = document.getElementById('btn-refresh');
-  const methodBtn = document.getElementById('btn-methodology');
+  const tabLedger = document.getElementById('tab-btn-ledger');
+  const tabRadar = document.getElementById('tab-btn-radar');
 
-  if (currentView === 'audit') {
-    // Switch to Market Radar
-    currentView = 'radar';
-    ledgerView.style.display = 'none';
-    radarView.style.display = 'block';
+  if (targetView === 'radar') {
+    if (ledgerView) ledgerView.style.display = 'none';
+    if (radarView) radarView.style.display = 'block';
 
-    if (badgeText) {
-      badgeText.textContent = 'Institutional';
-      badgeText.className = 'brand-badge';
+    if (tabLedger) {
+      tabLedger.classList.remove('active');
+      tabLedger.setAttribute('aria-selected', 'false');
     }
-    if (subText) {
-      subText.textContent = 'Bangalore Urban Belt • APMC Yeshwanthpur Price Intelligence Engine';
+    if (tabRadar) {
+      tabRadar.classList.add('active');
+      tabRadar.setAttribute('aria-selected', 'true');
     }
-    if (toggleBtnText) {
-      toggleBtnText.textContent = 'Audit Ledger';
-    }
-    if (verifyBtn) verifyBtn.style.display = 'none';
-    if (refreshBtn) refreshBtn.style.display = 'inline-flex';
-    if (methodBtn) methodBtn.style.display = 'inline-flex';
 
     fetchAndRenderPrices();
+    fetchAndRenderWeather();
   } else {
-    // Switch to Audit Ledger
-    currentView = 'audit';
-    radarView.style.display = 'none';
-    ledgerView.style.display = 'block';
+    // Audit Ledger view
+    if (radarView) radarView.style.display = 'none';
+    if (ledgerView) ledgerView.style.display = 'block';
 
-    if (badgeText) {
-      badgeText.textContent = 'AUDIT LEDGER';
-      badgeText.className = 'brand-badge brand-badge-audit';
+    if (tabRadar) {
+      tabRadar.classList.remove('active');
+      tabRadar.setAttribute('aria-selected', 'false');
     }
-    if (subText) {
-      subText.textContent = 'Prediction History & Daily Out-of-Sample Accuracy Evaluation Engine';
+    if (tabLedger) {
+      tabLedger.classList.add('active');
+      tabLedger.setAttribute('aria-selected', 'true');
     }
-    if (toggleBtnText) {
-      toggleBtnText.textContent = 'Live Market Radar';
-    }
-    if (verifyBtn) verifyBtn.style.display = 'inline-flex';
-    if (refreshBtn) refreshBtn.style.display = 'none';
-    if (methodBtn) methodBtn.style.display = 'none';
 
     fetchAndRenderLedger();
   }
+}
+
+/**
+ * Toggle Main View (for backwards compatibility)
+ */
+function toggleMainView() {
+  switchView(currentView === 'audit' ? 'radar' : 'audit');
 }
 
 /**
