@@ -1,6 +1,6 @@
 {
-  "_timestamp": 1794932215.6553645,
-  "as_of": "2026-11-17 21:46:55 IST",
+  "_timestamp": 1794934146.0775626,
+  "as_of": "2026-11-17 22:19:06 IST",
   "commodities": {
     "Onion": {
       "commodity": "Onion",
@@ -10,7 +10,7 @@
       "retail_avg": 78.5,
       "units": "1kg",
       "source": "vegetablemarketprice.com (Live Web Feed)",
-      "last_updated": "2026-11-17 21:46:55"
+      "last_updated": "2026-11-17 22:19:06"
     },
     "Tomato": {
       "commodity": "Tomato",
@@ -20,7 +20,7 @@
       "retail_avg": 38.5,
       "units": "1kg",
       "source": "vegetablemarketprice.com (Live Web Feed)",
-      "last_updated": "2026-11-17 21:46:55"
+      "last_updated": "2026-11-17 22:19:06"
     },
     "Potato": {
       "commodity": "Potato",
@@ -30,7 +30,7 @@
       "retail_avg": 39.5,
       "units": "1kg",
       "source": "vegetablemarketprice.com (Live Web Feed)",
-      "last_updated": "2026-11-17 21:46:55"
+      "last_updated": "2026-11-17 22:19:06"
     }
   }
 }
