@@ -256,3 +256,65 @@ python src/evaluate.py
 # 7. Run AI Economist Predictions
 python src/predict.py --commodity all
 ```
+
+---
+
+## 7. Production Deployment Guide
+
+AgroVision is production-ready across multiple deployment targets:
+
+### Option A: One-Click Local Production Server (Windows / Linux / macOS)
+The system automatically uses **Waitress** (Windows) or **Gunicorn** (Linux/macOS) with connection pooling and multi-threading:
+```powershell
+# Windows One-Click Deploy:
+.\deploy.bat
+
+# Or directly via Python:
+python scripts/run_production.py
+```
+App will be live at: **`http://localhost:5001`**
+
+---
+
+### Option B: Docker & Docker Compose (Fullstack with PostgreSQL)
+Spawns the web application and PostgreSQL 16 database with health checks and persistent volume storage:
+```bash
+# Build and run containers in detached mode:
+docker compose up -d --build
+
+# Check status:
+docker compose ps
+
+# View live application logs:
+docker compose logs -f web
+```
+* Web Dashboard: **`http://localhost:5001`**
+* PostgreSQL: **`localhost:5432`**
+
+---
+
+### Option C: Cloud Deployment (Render, Railway, Heroku)
+
+1. **Render**:
+   - Push your repository to GitHub.
+   - In Render Dashboard, click **New > Blueprint** and select your repository.
+   - Render automatically reads [`render.yaml`](file:///d:/Internship/ODU%20-%20frontback/render.yaml) to provision the Web Service and Managed PostgreSQL database.
+
+2. **Railway**:
+   - Run `railway up` or connect your GitHub repository in the Railway dashboard.
+   - Railway reads [`railway.json`](file:///d:/Internship/ODU%20-%20frontback/railway.json) and [`Procfile`](file:///d:/Internship/ODU%20-%20frontback/Procfile).
+
+3. **Heroku / Fly.io / AWS App Runner**:
+   - Uses standard [`Procfile`](file:///d:/Internship/ODU%20-%20frontback/Procfile):
+     ```
+     web: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+     ```
+
+---
+
+### Health & Monitoring Endpoints
+* **`GET /health`**: Returns JSON container health telemetry and database connection status.
+* **`GET /api/db/status`**: Detailed PostgreSQL table record counts and latency.
+* **`GET /api/prices`**: Real-time Bangalore market prices, wholesale spreads, and 14-day forecasts.
+* **`GET /api/ledger`**: Permanent prediction audit ledger.
+* **`POST /api/daily-train`**: Triggers autonomous daily continuous retraining on real market actuals.
