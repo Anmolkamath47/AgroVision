@@ -22,4 +22,4 @@ databases:
     region: singapore
     plan: free
     databaseName: agrovision
-    user: postgres
+    user: agrovision_user
